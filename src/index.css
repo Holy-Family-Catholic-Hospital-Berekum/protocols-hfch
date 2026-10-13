@@ -446,20 +446,6 @@ textarea.input {
   color: var(--text);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
 }
-.divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: var(--muted);
-  font-size: 0.85rem;
-}
-.divider::before,
-.divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--line);
-}
 .pending-orb {
   width: 96px;
   height: 96px;

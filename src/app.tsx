@@ -26,10 +26,11 @@ function AdminOnly({ children }: { children: ReactNode }) {
 }
 
 function Gate() {
-  const { user, profile, loading } = useAuth()
+  const { user, profile, loading, needsConnection } = useAuth()
 
   if (loading) return <Splash />
   if (!user) return <LoginPage />
+  if (needsConnection) return <PendingPage offline />
   if (!profile || profile.role === 'pending' || profile.role === 'rejected') return <PendingPage />
 
   return (

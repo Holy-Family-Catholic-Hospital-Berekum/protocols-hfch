@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app'
-import { getAuth } from 'firebase/auth'
+import { browserLocalPersistence, indexedDBLocalPersistence, initializeAuth } from 'firebase/auth'
 import {
   initializeFirestore,
   persistentLocalCache,
@@ -24,9 +24,16 @@ if (missing.length > 0) {
 }
 
 export const app = initializeApp(firebaseConfig)
-export const auth = getAuth(app)
 
-// Offline cache: protocols a doctor has opened stay readable without a connection.
+// Session is stored on the device and never expires on its own: users stay signed in until they sign out.
+export const auth = initializeAuth(app, {
+  persistence: [indexedDBLocalPersistence, browserLocalPersistence],
+})
+
+// Ask the browser not to evict saved data (session + offline protocols) under storage pressure.
+void navigator.storage?.persist?.().catch(() => undefined)
+
+// Offline cache: the full protocol list is cached on first load and stays readable without a connection.
 export const db = initializeFirestore(app, {
   ignoreUndefinedProperties: true,
   localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
