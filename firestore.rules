@@ -1,0 +1,83 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function profilePath() {
+      return /databases/$(database)/documents/users/$(request.auth.uid);
+    }
+
+    function hasRole(roles) {
+      return signedIn() && exists(profilePath()) && get(profilePath()).data.role in roles;
+    }
+
+    function isAdmin() {
+      return hasRole(['admin']);
+    }
+
+    function isApproved() {
+      return hasRole(['staff', 'admin']);
+    }
+
+    // ---- User profiles ----
+    match /users/{uid} {
+      allow get: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow list: if isAdmin();
+
+      // Anyone signed in can create ONLY their own profile, and only as 'pending'.
+      allow create: if signedIn()
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['email', 'displayName', 'role', 'createdAt'])
+        && request.resource.data.role == 'pending'
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.displayName is string
+        && request.resource.data.displayName.size() <= 120
+        && request.resource.data.createdAt == request.time;
+
+      // Admins change other people's roles (never their own, so they cannot lock themselves out).
+      allow update: if (
+          isAdmin()
+          && request.auth.uid != uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['role'])
+          && request.resource.data.role in ['pending', 'staff', 'admin', 'rejected']
+        ) || (
+          signedIn()
+          && request.auth.uid == uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName'])
+          && request.resource.data.displayName is string
+          && request.resource.data.displayName.size() <= 120
+        );
+
+      allow delete: if false;
+    }
+
+    // ---- Protocols ----
+    match /protocols/{protocolId} {
+      // Staff only ever see published protocols. Drafts are admin-only.
+      allow read: if isAdmin() || (isApproved() && resource.data.status == 'published');
+
+      allow create, update: if isAdmin()
+        && request.resource.data.status in ['draft', 'published']
+        && request.resource.data.title is string
+        && request.resource.data.sections is list;
+
+      allow delete: if isAdmin();
+
+      // Archived versions are an audit trail: append-only.
+      match /versions/{versionId} {
+        allow read: if isApproved();
+        allow create: if isAdmin();
+        allow update, delete: if false;
+      }
+    }
+
+    // Everything else is closed.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

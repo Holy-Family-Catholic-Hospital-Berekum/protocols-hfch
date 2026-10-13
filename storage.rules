@@ -1,0 +1,25 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function role() {
+      return firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    match /protocols/{protocolId}/{fileName} {
+      allow read: if request.auth != null && role() in ['staff', 'admin'];
+
+      allow create, update: if request.auth != null
+        && role() == 'admin'
+        && request.resource.size < 20 * 1024 * 1024
+        && request.resource.contentType.matches('application/pdf|application/msword|application/vnd[.]openxmlformats-officedocument[.]wordprocessingml[.]document|image/(png|jpeg|webp)');
+
+      allow delete: if request.auth != null && role() == 'admin';
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

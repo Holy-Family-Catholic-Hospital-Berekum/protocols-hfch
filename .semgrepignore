@@ -1,0 +1,3 @@
+# Skip everything git ignores (.env, node_modules, dist, ...).
+# .env holds the Firebase web config, which is public by design; access is enforced by security rules.
+:include .gitignore
