@@ -11,7 +11,6 @@ import { SURGERY_GUIDELINES } from './surgery'
  */
 
 
-const PLACEHOLDER_CONTACT = { name: '[To be confirmed]', phone: '' }
 
 export const STARTER_PROTOCOLS: Record<string, ProtocolContent> = {
   acs: {
@@ -97,7 +96,7 @@ export const STARTER_PROTOCOLS: Record<string, ProtocolContent> = {
             type: 'list',
             ordered: true,
             items: [
-              { text: '**STAT** call Cardiology Team to confirm diagnosis', stat: true, sub: ['Cardiology team: [To be confirmed]'] },
+              { text: '**STAT** call Cardiology Team to confirm diagnosis', stat: true },
               { text: 'Complete **Thrombolysis Checklist** and obtain patient consent' },
               { text: 'Notify Pharmacy Team' },
               { text: '**Initiate thrombolysis** !!(within 30 min)!!', sub: ['continuous cardiac monitoring'] },
@@ -142,14 +141,6 @@ export const STARTER_PROTOCOLS: Record<string, ProtocolContent> = {
             title: '*Contraindications to DAPT (to be discussed with cardiology)',
             text: 'previous intracranial hemorrhage or ongoing bleeding',
           },
-        ],
-      },
-      {
-        id: 'contacts',
-        title: 'Contacts',
-        blocks: [
-          { type: 'contacts', title: 'Cardiology Team', people: [PLACEHOLDER_CONTACT] },
-          { type: 'contacts', title: 'Pharmacy Team', people: [PLACEHOLDER_CONTACT] },
         ],
       },
     ],
