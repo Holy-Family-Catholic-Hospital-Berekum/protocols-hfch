@@ -6,7 +6,10 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      // New versions activate in the background; src/components/updatePrompt.tsx registers the worker,
+      // checks for updates whenever the app is resumed, and asks before reloading.
       registerType: 'autoUpdate',
+      injectRegister: false,
       includeAssets: ['icon-192.png', 'icon-512.png'],
       manifest: {
         name: 'HFCH Clinical Protocols',
@@ -24,6 +27,9 @@ export default defineConfig({
         ],
       },
       workbox: {
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
         globPatterns: ['**/*.{js,css,html,png,svg,woff2}'],
         navigateFallback: '/index.html',
         runtimeCaching: [

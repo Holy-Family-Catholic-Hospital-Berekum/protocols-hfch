@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider, useAuth } from './auth/authContext'
 import { ProtocolsProvider } from './lib/protocolsContext'
 import { AppShell } from './components/appShell'
+import { UpdatePrompt } from './components/updatePrompt'
 import { LoginPage } from './pages/loginPage'
 import { PendingPage } from './pages/pendingPage'
 import { HomePage } from './pages/homePage'
@@ -54,6 +55,7 @@ function Gate() {
 export default function App() {
   return (
     <BrowserRouter>
+      <UpdatePrompt />
       <AuthProvider>
         <Gate />
       </AuthProvider>
