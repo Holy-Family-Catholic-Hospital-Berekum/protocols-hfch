@@ -15,7 +15,7 @@ const PLACEHOLDER_CONTACT = { name: '[To be confirmed]', phone: '' }
 export const STARTER_PROTOCOLS: Record<string, ProtocolContent> = {
   acs: {
     title: 'Acute Coronary Syndrome',
-    category: 'internal-medicine',
+    category: 'emergency',
     version: 'v3.0',
     summary: 'Chest pain suggestive of acute ischemia/infarction. Immediate management, then STEMI or NSTEMI / Unstable Angina pathway.',
     keywords: ['ACS', 'STEMI', 'NSTEMI', 'unstable angina', 'chest pain', 'myocardial infarction', 'MI', 'thrombolysis', 'troponin', 'DAPT', 'aspirin', 'nitroglycerin'],
@@ -156,7 +156,7 @@ export const STARTER_PROTOCOLS: Record<string, ProtocolContent> = {
 
   bradycardia: {
     title: 'Adult Bradycardia with a Pulse',
-    category: 'internal-medicine',
+    category: 'emergency',
     version: 'v1.1',
     summary: 'Immediate management, stable vs unstable pathway, atropine, pacing and infusions, and primary etiology.',
     keywords: ['bradycardia', 'heart block', 'atropine', 'pacing', 'dopamine', 'epinephrine', 'glucagon', 'slow heart rate'],
@@ -440,7 +440,7 @@ export const STARTER_PROTOCOLS: Record<string, ProtocolContent> = {
 
   'cardiogenic-shock': {
     title: 'Adults with Cardiogenic Shock',
-    category: 'internal-medicine',
+    category: 'emergency',
     version: 'v3.0',
     summary: 'Immediate management, "dry and cold" vs "wet and cold", vasopressors/inotropes by SBP, and primary etiology.',
     keywords: ['cardiogenic shock', 'shock', 'hypotension', 'norepinephrine', 'dobutamine', 'vasopressor', 'inotrope', 'MAP', 'PCWP', 'heart failure'],

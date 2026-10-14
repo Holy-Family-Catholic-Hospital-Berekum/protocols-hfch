@@ -1,4 +1,4 @@
-import { Baby, Scissors, Siren, Stethoscope, Syringe, Venus, type LucideIcon } from 'lucide-react'
+import { Baby, Scissors, Siren, Smile, Stethoscope, Syringe, Venus, type LucideIcon } from 'lucide-react'
 
 export interface Category {
   id: string
@@ -9,9 +9,10 @@ export interface Category {
 }
 
 export const CATEGORIES: Category[] = [
-  { id: 'anaesthetics', name: 'Anaesthetics', icon: Syringe, colors: ['#a78bfa', '#6d28d9'] },
-  { id: 'emergency', name: 'Emergency', icon: Siren, colors: ['#ff5f6d', '#c21858'] },
+  { id: 'anaesthesia', name: 'Anaesthesia', icon: Syringe, colors: ['#a78bfa', '#6d28d9'] },
+  { id: 'emergency', name: 'Emergency Medicine', icon: Siren, colors: ['#ff5f6d', '#c21858'] },
   { id: 'internal-medicine', name: 'Internal Medicine', icon: Stethoscope, colors: ['#38bdf8', '#1d4ed8'] },
+  { id: 'maxillofacial-dental', name: 'Maxillofacial / Dental', icon: Smile, colors: ['#fdba74', '#ea580c'] },
   { id: 'obs-gyn', name: 'Obs & Gyn', icon: Venus, colors: ['#f9a8d4', '#db2777'] },
   { id: 'paediatrics', name: 'Paediatrics', icon: Baby, colors: ['#5eead4', '#0f766e'] },
   { id: 'surgery', name: 'Surgery', icon: Scissors, colors: ['#fbbf24', '#d97706'] },
@@ -19,7 +20,9 @@ export const CATEGORIES: Category[] = [
 
 /** Category ids used before the department list was finalised, mapped to their department. */
 const LEGACY: Record<string, string> = {
-  cardiology: 'internal-medicine',
+  anaesthetics: 'anaesthesia',
+  // The original protocols (ACS, bradycardia, cardiac arrest, cardiogenic shock) came from Emergency.
+  cardiology: 'emergency',
   resuscitation: 'emergency',
   neurology: 'internal-medicine',
   endocrine: 'internal-medicine',
@@ -33,5 +36,5 @@ const LEGACY: Record<string, string> = {
 
 export function getCategory(id: string): Category {
   const resolved = LEGACY[id] ?? id
-  return CATEGORIES.find((c) => c.id === resolved) ?? CATEGORIES[2]
+  return CATEGORIES.find((c) => c.id === resolved) ?? CATEGORIES[1]
 }
