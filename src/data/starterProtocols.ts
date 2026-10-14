@@ -9,7 +9,6 @@ import type { ProtocolContent } from '../types/protocol'
  * They are imported as DRAFTS and must be verified by a clinician before publishing.
  */
 
-const SOURCE = 'Adapted by the Tamale Teaching Hospital, Department of Internal Medicine and Therapeutics'
 
 const PLACEHOLDER_CONTACT = { name: '[To be confirmed]', phone: '' }
 
@@ -20,7 +19,6 @@ export const STARTER_PROTOCOLS: Record<string, ProtocolContent> = {
     version: 'v3.0',
     summary: 'Chest pain suggestive of acute ischemia/infarction. Immediate management, then STEMI or NSTEMI / Unstable Angina pathway.',
     keywords: ['ACS', 'STEMI', 'NSTEMI', 'unstable angina', 'chest pain', 'myocardial infarction', 'MI', 'thrombolysis', 'troponin', 'DAPT', 'aspirin', 'nitroglycerin'],
-    source: SOURCE,
     attachments: [],
     timer: { enabled: true },
     sections: [
@@ -162,7 +160,6 @@ export const STARTER_PROTOCOLS: Record<string, ProtocolContent> = {
     version: 'v1.1',
     summary: 'Immediate management, stable vs unstable pathway, atropine, pacing and infusions, and primary etiology.',
     keywords: ['bradycardia', 'heart block', 'atropine', 'pacing', 'dopamine', 'epinephrine', 'glucagon', 'slow heart rate'],
-    source: SOURCE,
     attachments: [],
     timer: { enabled: false },
     sections: [
@@ -287,7 +284,6 @@ export const STARTER_PROTOCOLS: Record<string, ProtocolContent> = {
     version: 'v5.0',
     summary: 'CPR, rhythm checks every 2 min, shockable and non-shockable pathways, ROSC and reversible causes.',
     keywords: ['cardiac arrest', 'CPR', 'ACLS', 'VF', 'ventricular fibrillation', 'VT', 'PEA', 'asystole', 'shock', 'defibrillation', 'epinephrine', 'amiodarone', 'ROSC', "H's and T's"],
-    source: SOURCE,
     attachments: [],
     timer: { enabled: true, cycleSeconds: 120 },
     sections: [
@@ -448,7 +444,6 @@ export const STARTER_PROTOCOLS: Record<string, ProtocolContent> = {
     version: 'v3.0',
     summary: 'Immediate management, "dry and cold" vs "wet and cold", vasopressors/inotropes by SBP, and primary etiology.',
     keywords: ['cardiogenic shock', 'shock', 'hypotension', 'norepinephrine', 'dobutamine', 'vasopressor', 'inotrope', 'MAP', 'PCWP', 'heart failure'],
-    source: SOURCE,
     attachments: [],
     timer: { enabled: false },
     sections: [

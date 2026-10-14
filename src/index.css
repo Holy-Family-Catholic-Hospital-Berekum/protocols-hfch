@@ -45,10 +45,6 @@
   box-sizing: border-box;
 }
 
-html {
-  scroll-padding-top: calc(var(--topbar-h) + var(--toc-h) + 16px);
-}
-
 body {
   margin: 0;
   min-height: 100dvh;
@@ -1126,13 +1122,6 @@ textarea.input {
   gap: 8px;
   margin-top: 16px;
 }
-.p-source {
-  text-align: center;
-  font-size: 0.82rem;
-  color: var(--muted);
-  font-style: italic;
-  margin: 28px 0 0;
-}
 
 /* Contents: sticky chip bar on phones, sidebar on wide screens */
 .protocol-layout {
@@ -1254,8 +1243,10 @@ textarea.input {
   .toc-item:hover {
     background: var(--glass);
   }
-  html {
-    scroll-padding-top: calc(var(--topbar-h) + 20px);
+  /* Contents is a sidebar here, so jumps only need to clear the top bar. */
+  .section,
+  .flow-node {
+    scroll-margin-top: calc(var(--topbar-h) + 20px);
   }
 }
 

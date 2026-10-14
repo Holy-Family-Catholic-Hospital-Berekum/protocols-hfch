@@ -89,8 +89,6 @@ export interface ProtocolContent {
   version: string
   summary: string
   keywords: string[]
-  /** Who the protocol was adapted from. */
-  source: string
   sections: Section[]
   attachments: Attachment[]
   timer: TimerConfig

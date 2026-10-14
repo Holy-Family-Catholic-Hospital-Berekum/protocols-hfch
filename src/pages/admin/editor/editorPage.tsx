@@ -390,10 +390,6 @@ export function EditorPage() {
               onChange={(e) => update({ keywords: e.target.value.split(',').map((k) => k.trim()).filter(Boolean) })}
             />
           </label>
-          <label className="lbl">
-            Source / adapted from
-            <input className="input" value={content.source} onChange={(e) => update({ source: e.target.value })} />
-          </label>
           <div className="row-fields">
             <label className="check inline">
               <input type="checkbox" checked={content.timer.enabled} onChange={(e) => update({ timer: { ...content.timer, enabled: e.target.checked } })} />

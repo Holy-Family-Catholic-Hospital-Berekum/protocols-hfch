@@ -166,7 +166,6 @@ export function ProtocolPage() {
 
       <AttachmentList attachments={protocol.attachments ?? []} />
 
-      {protocol.source && <p className="p-source">{protocol.source}</p>}
 
       <Timer protocolId={protocol.id} config={protocol.timer ?? { enabled: false }} />
 

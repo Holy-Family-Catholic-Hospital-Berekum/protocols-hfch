@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type RefObject } from 'react'
 import { Clock, Sparkles } from 'lucide-react'
 import type { Section } from '../../types/protocol'
 import { BlockView, type BlockContext } from './blocks'
-import { anchorDomId, buildAnchorIndex, scrollToAnchor } from './anchors'
+import { JUMP_EVENT, anchorDomId, buildAnchorIndex, scrollToAnchor } from './anchors'
 
 interface Props {
   sections: Section[]
@@ -10,36 +10,80 @@ interface Props {
   availableProtocols: Map<string, string>
 }
 
-/** Tracks which section is currently in view for the contents bar. */
-function useActiveSection(ids: string[]) {
+/**
+ * Tracks the section being read: the last section whose top has scrolled up to just below the
+ * contents bar. After a jump (contents chip or branch button) the target stays selected until the
+ * reader touches/scrolls again, so short sections at the end of the page still highlight correctly.
+ */
+function useActiveSection(sections: Section[], navRef: RefObject<HTMLElement | null>) {
+  const ids = useMemo(() => sections.map((s) => s.id), [sections])
   const [active, setActive] = useState(ids[0] ?? '')
+  const pinned = useRef<string | null>(null)
+
+  // Flow steps live inside sections; a jump to a step selects its section.
+  const sectionOf = useMemo(() => {
+    const map = new Map<string, string>()
+    for (const s of sections) {
+      map.set(s.id, s.id)
+      for (const b of s.blocks) if (b.type === 'flow') b.nodes.forEach((n) => map.set(n.id, s.id))
+    }
+    return map
+  }, [sections])
+
   useEffect(() => {
-    const visible = new Map<string, number>()
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          const id = e.target.getAttribute('data-section') ?? ''
-          if (e.isIntersecting) visible.set(id, e.boundingClientRect.top)
-          else visible.delete(id)
-        }
-        const first = ids.find((id) => visible.has(id))
-        if (first) setActive(first)
-      },
-      { rootMargin: '-140px 0px -55% 0px' },
-    )
-    ids.forEach((id) => {
-      const el = document.getElementById(anchorDomId(id))
-      if (el) observer.observe(el)
-    })
-    return () => observer.disconnect()
-  }, [ids])
+    let frame = 0
+    const compute = () => {
+      frame = 0
+      if (pinned.current) return setActive(pinned.current)
+      const sidebar = window.matchMedia('(min-width: 1000px)').matches
+      const edge = sidebar
+        ? (document.querySelector('.topbar')?.getBoundingClientRect().bottom ?? 60)
+        : (navRef.current?.getBoundingClientRect().bottom ?? 120)
+      const line = edge + 24
+      let current = ids[0] ?? ''
+      for (const id of ids) {
+        const el = document.getElementById(anchorDomId(id))
+        if (!el) continue
+        if (el.getBoundingClientRect().top <= line) current = id
+        else break
+      }
+      setActive(current)
+    }
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(compute)
+    }
+    const release = () => {
+      pinned.current = null
+    }
+    const onJump = (e: Event) => {
+      const section = sectionOf.get((e as CustomEvent<string>).detail)
+      if (!section) return
+      pinned.current = section
+      setActive(section)
+    }
+
+    compute()
+    window.addEventListener('scroll', schedule, { passive: true })
+    window.addEventListener('resize', schedule)
+    window.addEventListener(JUMP_EVENT, onJump)
+    // Any manual interaction hands control back to scroll tracking.
+    for (const t of ['touchstart', 'wheel', 'keydown', 'mousedown'] as const) window.addEventListener(t, release, { passive: true })
+    return () => {
+      if (frame) cancelAnimationFrame(frame)
+      window.removeEventListener('scroll', schedule)
+      window.removeEventListener('resize', schedule)
+      window.removeEventListener(JUMP_EVENT, onJump)
+      for (const t of ['touchstart', 'wheel', 'keydown', 'mousedown'] as const) window.removeEventListener(t, release)
+    }
+  }, [ids, sectionOf, navRef])
+
   return active
 }
 
 export function ProtocolView({ sections, changedSections = [], availableProtocols }: Props) {
   const anchors = useMemo(() => buildAnchorIndex(sections), [sections])
-  const ids = useMemo(() => sections.map((s) => s.id), [sections])
-  const active = useActiveSection(ids)
+  const navRef = useRef<HTMLElement>(null)
+  const active = useActiveSection(sections, navRef)
   const tocRef = useRef<HTMLDivElement>(null)
   const ctx: BlockContext = { anchors, availableProtocols }
 
@@ -55,7 +99,7 @@ export function ProtocolView({ sections, changedSections = [], availableProtocol
 
   return (
     <div className="protocol-layout">
-      <nav className="toc" aria-label="Contents">
+      <nav className="toc" aria-label="Contents" ref={navRef}>
         <div className="toc-title">Contents</div>
         <div className="toc-items" ref={tocRef}>
           {sections.map((s, i) => (

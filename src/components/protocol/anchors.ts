@@ -33,9 +33,13 @@ export function anchorDomId(id: string) {
   return `a-${id}`
 }
 
+/** Fired on window with the target id, so the contents bar can select the section jumped to. */
+export const JUMP_EVENT = 'protocol:jump'
+
 export function scrollToAnchor(id: string) {
   const el = document.getElementById(anchorDomId(id))
   if (!el) return
+  window.dispatchEvent(new CustomEvent(JUMP_EVENT, { detail: id }))
   el.scrollIntoView({ behavior: 'smooth', block: 'start' })
   el.classList.remove('flash')
   // Restart the highlight animation so the doctor sees where they landed.
