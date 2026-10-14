@@ -2335,3 +2335,11 @@ textarea.input {
 .has-bottom-nav .save-bar {
   bottom: calc(var(--nav-h) + 10px + env(safe-area-inset-bottom));
 }
+
+.users-search {
+  margin: 14px 0 4px;
+}
+.user-error {
+  flex-basis: 100%;
+  margin: 4px 0 0;
+}

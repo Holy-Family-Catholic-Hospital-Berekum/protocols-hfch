@@ -1,21 +1,28 @@
-import { useState } from 'react'
-import { Check, Crown, Loader2, ShieldOff, UserMinus, UserPlus, X } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { Ban, Check, Crown, Loader2, Search, ShieldOff, Trash2, UserPlus, X } from 'lucide-react'
 import { useAuth, type Role } from '../../auth/authContext'
-import { setRole, useUsers, type UserRecord } from '../../lib/users'
+import { deleteUserAccount, setRole, useUsers, type UserRecord } from '../../lib/users'
 import { formatDate } from '../../lib/format'
 
 function UserRow({ u, self }: { u: UserRecord; self: boolean }) {
   const [busy, setBusy] = useState(false)
-  const change = async (role: Role, confirmText?: string) => {
+  const [error, setError] = useState('')
+  const name = u.displayName || u.email
+
+  const run = async (action: () => Promise<void>, confirmText?: string) => {
     if (confirmText && !confirm(confirmText)) return
     setBusy(true)
+    setError('')
     try {
-      await setRole(u.uid, role)
-    } finally {
+      await action()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong.')
       setBusy(false)
+      return
     }
+    setBusy(false)
   }
-  const name = u.displayName || u.email
+  const change = (role: Role, confirmText?: string) => run(() => setRole(u.uid, role), confirmText)
 
   return (
     <div className="user-row glass">
@@ -28,34 +35,65 @@ function UserRow({ u, self }: { u: UserRecord; self: boolean }) {
         {busy && <Loader2 size={18} className="spin" aria-label="Saving" />}
         {self ? (
           <span className="role-pill role-admin">You</span>
-        ) : u.role === 'pending' ? (
-          <>
-            <button type="button" className="btn primary small" disabled={busy} onClick={() => change('staff')}>
-              <Check size={16} aria-hidden /> Approve
-            </button>
-            <button type="button" className="btn ghost small" disabled={busy} onClick={() => change('rejected', `Decline access for ${name}?`)}>
-              <X size={16} aria-hidden /> Decline
-            </button>
-          </>
-        ) : u.role === 'staff' ? (
-          <>
-            <button type="button" className="btn ghost small" disabled={busy} onClick={() => change('admin', `Make ${name} an admin? They will be able to edit and publish protocols and manage users.`)}>
-              <Crown size={16} aria-hidden /> Make admin
-            </button>
-            <button type="button" className="btn ghost small danger" disabled={busy} onClick={() => change('rejected', `Remove access for ${name}?`)}>
-              <UserMinus size={16} aria-hidden /> Remove
-            </button>
-          </>
-        ) : u.role === 'admin' ? (
-          <button type="button" className="btn ghost small" disabled={busy} onClick={() => change('staff', `Remove admin rights from ${name}?`)}>
-            <ShieldOff size={16} aria-hidden /> Make staff
-          </button>
         ) : (
-          <button type="button" className="btn ghost small" disabled={busy} onClick={() => change('staff')}>
-            <UserPlus size={16} aria-hidden /> Restore access
-          </button>
+          <>
+            {u.role === 'pending' && (
+              <>
+                <button type="button" className="btn primary small" disabled={busy} onClick={() => change('staff')}>
+                  <Check size={16} aria-hidden /> Approve
+                </button>
+                <button type="button" className="btn ghost small" disabled={busy} onClick={() => change('rejected', `Decline access for ${name}?`)}>
+                  <X size={16} aria-hidden /> Decline
+                </button>
+              </>
+            )}
+            {u.role === 'staff' && (
+              <>
+                <button
+                  type="button"
+                  className="btn ghost small"
+                  disabled={busy}
+                  onClick={() => change('admin', `Make ${name} an admin? They will be able to edit and publish protocols and manage users.`)}
+                >
+                  <Crown size={16} aria-hidden /> Make admin
+                </button>
+                <button
+                  type="button"
+                  className="btn ghost small"
+                  disabled={busy}
+                  onClick={() => change('rejected', `Block ${name}? They will lose access immediately. You can restore access later.`)}
+                >
+                  <Ban size={16} aria-hidden /> Block
+                </button>
+              </>
+            )}
+            {u.role === 'admin' && (
+              <button type="button" className="btn ghost small" disabled={busy} onClick={() => change('staff', `Remove admin rights from ${name}?`)}>
+                <ShieldOff size={16} aria-hidden /> Make staff
+              </button>
+            )}
+            {u.role === 'rejected' && (
+              <button type="button" className="btn ghost small" disabled={busy} onClick={() => change('staff')}>
+                <UserPlus size={16} aria-hidden /> Restore access
+              </button>
+            )}
+            <button
+              type="button"
+              className="btn ghost small danger"
+              disabled={busy}
+              onClick={() =>
+                run(
+                  () => deleteUserAccount(u.uid),
+                  `Permanently delete ${name}?\n\nTheir account will be removed and they will be signed out. This cannot be undone; they would have to sign up again with a new account.`,
+                )
+              }
+            >
+              <Trash2 size={16} aria-hidden /> Delete
+            </button>
+          </>
         )}
       </div>
+      {error && <div className="form-error user-error">{error}</div>}
     </div>
   )
 }
@@ -64,24 +102,55 @@ const GROUPS: { role: Role; title: string }[] = [
   { role: 'pending', title: 'Waiting for approval' },
   { role: 'admin', title: 'Admins' },
   { role: 'staff', title: 'Staff' },
-  { role: 'rejected', title: 'Declined / removed' },
+  { role: 'rejected', title: 'Declined / blocked' },
 ]
 
 export function UsersPage() {
   const { profile } = useAuth()
   const { users, loading } = useUsers(true)
+  const [query, setQuery] = useState('')
+
+  const filtered = useMemo(() => {
+    const terms = query.toLowerCase().split(/\s+/).filter(Boolean)
+    if (terms.length === 0) return users
+    return users.filter((u) => {
+      const text = `${u.displayName} ${u.email}`.toLowerCase()
+      return terms.every((t) => text.includes(t))
+    })
+  }, [users, query])
+
+  const searching = query.trim().length > 0
 
   return (
     <div className="users">
       <h1>Users</h1>
+
+      <div className="search glass users-search">
+        <Search size={20} aria-hidden />
+        <input
+          type="search"
+          placeholder="Search by name or email…"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          aria-label="Search users"
+        />
+        {query && (
+          <button type="button" className="icon-btn" onClick={() => setQuery('')} aria-label="Clear search">
+            <X size={18} />
+          </button>
+        )}
+      </div>
+
       {loading ? (
         <div className="center-pad">
           <Loader2 className="spin" size={28} aria-label="Loading" />
         </div>
+      ) : searching && filtered.length === 0 ? (
+        <div className="empty glass">No users match “{query.trim()}”.</div>
       ) : (
         GROUPS.map(({ role, title }) => {
-          const list = users.filter((u) => u.role === role)
-          if (list.length === 0 && role !== 'pending') return null
+          const list = filtered.filter((u) => u.role === role)
+          if (list.length === 0 && (searching || role !== 'pending')) return null
           return (
             <section key={role} className="group">
               <h2 className="list-head">

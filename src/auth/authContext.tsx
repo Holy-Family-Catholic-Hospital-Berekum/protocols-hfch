@@ -92,9 +92,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               pendingDisplayName = null
             })
             .catch((err) => {
+              // Refused by the rules: the account was deleted by an admin. Sign this device out.
               console.error('Could not create profile', err)
               setProfile(null)
               setLoading(false)
+              void fbSignOut(auth)
             })
         },
         () => {

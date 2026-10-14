@@ -29,3 +29,6 @@ firebase-debug.log
 # Misc
 *.local
 *.sw?
+
+# Cloud Functions build output
+functions/lib

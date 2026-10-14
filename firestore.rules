@@ -29,8 +29,10 @@ service cloud.firestore {
       allow list: if isAdmin();
 
       // Anyone signed in can create ONLY their own profile, and only as 'pending'.
+      // Deleted accounts (tombstoned by the deleteUser function) can never recreate a profile.
       allow create: if signedIn()
         && request.auth.uid == uid
+        && !exists(/databases/$(database)/documents/deletedUsers/$(uid))
         && request.resource.data.keys().hasOnly(['email', 'displayName', 'role', 'createdAt'])
         && request.resource.data.role == 'pending'
         && request.resource.data.email == request.auth.token.email
