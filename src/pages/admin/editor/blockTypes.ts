@@ -10,4 +10,6 @@ export const BLOCK_TYPES: { type: Block['type']; label: string; make: () => Bloc
   { type: 'link', label: 'Link', make: () => ({ type: 'link', protocolId: '', label: '' }) },
   { type: 'contacts', label: 'Contacts', make: () => ({ type: 'contacts', title: '', people: [] }) },
   { type: 'flow', label: 'Flow (loops, e.g. CPR)', make: () => ({ type: 'flow', nodes: [] }) },
+  { type: 'figure', label: 'Figure (from original)', make: () => ({ type: 'figure', caption: '' }) },
+  { type: 'references', label: 'References', make: () => ({ type: 'references', items: [] }) },
 ]

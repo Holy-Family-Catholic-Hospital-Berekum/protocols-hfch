@@ -16,7 +16,6 @@ import {
 } from 'firebase/firestore'
 import { deleteObject, getDownloadURL, ref, uploadBytes } from 'firebase/storage'
 import { db, storage } from './firebase'
-import { STARTER_PROTOCOLS } from '../data/starterProtocols'
 import type { Attachment, Protocol, ProtocolContent, ProtocolVersion, Section } from '../types/protocol'
 
 const protocolsCol = collection(db, 'protocols')
@@ -175,6 +174,7 @@ export async function deleteProtocol(protocol: Protocol) {
 /** Imports the bundled starter protocols as drafts. Existing protocols are left untouched. */
 export async function importStarterProtocols(uid: string): Promise<number> {
   let created = 0
+  const { STARTER_PROTOCOLS } = await import('../data/starterProtocols')
   for (const [id, content] of Object.entries(STARTER_PROTOCOLS)) {
     const existing = await getDoc(doc(protocolsCol, id))
     if (existing.exists()) continue

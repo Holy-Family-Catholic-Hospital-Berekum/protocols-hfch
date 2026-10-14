@@ -7,7 +7,7 @@ import { searchProtocols } from '../lib/search'
 import { CATEGORIES, getCategory } from '../config/categories'
 import { daysSince, formatDate } from '../lib/format'
 import { importStarterProtocols } from '../lib/protocols'
-import { STARTER_PROTOCOLS } from '../data/starterProtocols'
+import { STARTER_IDS } from '../data/starterIds'
 import type { Protocol } from '../types/protocol'
 
 const RECENT_DAYS = 30
@@ -61,7 +61,7 @@ export function HomePage() {
     searchRef.current?.focus({ preventScroll: true })
   }, [focusSearch])
 
-  const missingStarters = isAdmin && !loading && Object.keys(STARTER_PROTOCOLS).some((id) => !protocols.some((p) => p.id === id))
+  const missingStarters = isAdmin && !loading && STARTER_IDS.some((id) => !protocols.some((p) => p.id === id))
 
   const results = useMemo(() => {
     const inCategory = category ? protocols.filter((p) => getCategory(p.category).id === category) : protocols

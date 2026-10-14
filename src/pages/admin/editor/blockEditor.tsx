@@ -337,5 +337,35 @@ export function BlockEditor({ block, onChange, env }: { block: Block; onChange: 
 
     case 'flow':
       return <FlowEditor nodes={block.nodes} onChange={(nodes) => onChange({ ...block, nodes })} env={env} />
+
+    case 'figure':
+      return (
+        <>
+          <TextField label="Caption" value={block.caption} onChange={(caption) => onChange({ ...block, caption })} />
+          <label className="lbl">
+            Page in the original document
+            <input
+              className="input"
+              type="number"
+              min={1}
+              value={block.page ?? ''}
+              onChange={(e) => onChange({ ...block, page: Number(e.target.value) || undefined })}
+            />
+          </label>
+          <TextField label="Note (optional)" value={block.note ?? ''} onChange={(note) => onChange({ ...block, note: note || undefined })} />
+        </>
+      )
+
+    case 'references':
+      return (
+        <LinesField
+          label="References"
+          hint="One per line"
+          initial={arrayToLines(block.items)}
+          parse={linesToArray}
+          onChange={(items) => onChange({ ...block, items })}
+          rows={4}
+        />
+      )
   }
 }

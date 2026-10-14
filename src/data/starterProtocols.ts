@@ -1,4 +1,5 @@
 import type { ProtocolContent } from '../types/protocol'
+import { SURGERY_GUIDELINES } from './surgery'
 
 /**
  * Starter protocols transcribed from the source PDF (pages 1-4).
@@ -561,4 +562,6 @@ export const STARTER_PROTOCOLS: Record<string, ProtocolContent> = {
       },
     ],
   },
+
+  'surgery-guidelines': SURGERY_GUIDELINES,
 }

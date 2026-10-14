@@ -1,0 +1,447 @@
+import type { Block, Section } from '../../types/protocol'
+import { box, danger, li, note, ol, p, refs, sec, see, table, ul, warn, type Place } from './helpers'
+
+const URO: Place = { chapter: '5. Surgical emergencies', subchapter: '5.5 Urologic' }
+const VASC: Place = { chapter: '5. Surgical emergencies', subchapter: '5.6 Vascular' }
+
+const WHO_2003 = 'WHO 2003; Surgical Care at the District Hospital; Interprint Limited, Geneva; ISBN 9241545755'
+const GHANA_STG = 'Ministry of Health, Ghana National Drugs Programme 2017; Standard Treatment Guidelines; Seventh edition'
+const HFCH = 'Holy Family Hospital, Berekum; Protocols for surgical emergencies'
+const OHCM = 'Longmore M. et al 2010; Oxford handbook of Clinical Medicine; 8th Edition; New York: Oxford University Press'
+
+/** Heparinisation + warfarinisation, identical in 5.6.1 and 5.6.2 of the source. */
+const anticoagulation = (): Block[] => [
+  box(
+    'urgent',
+    'Heparinisation',
+    '1. Give a bolus of IV Heparin 5.000-10.000IU',
+    '2. Follow up with: IV Heparin 500-1.500IU/hr by continuous infusion OR SC Heparin 15.000-17.500IU 12 hrly',
+    '3. Check APTT daily and maintain between 1.5 - 2.5',
+  ),
+  box(
+    'info',
+    'Warfarinisation (start on same day as heparinisation)',
+    'Day 1: 10mg OD; Day 2: 10mg OD; Day 3: 5mg OD; Followed by 5mg OD on subsequent days',
+    'Check INR on day 3',
+    'INR between therapeutic range? → Stop IV/SC Heparin; Continue oral Warfarin 5mg OD on subsequent days; Monitor INR and if neccessary change dose of oral Warfarin to keep INR between therapeutic range',
+    'INR not between therapeutic range? → Continue IV/SC Heparin and oral Warfarin',
+  ),
+]
+
+export const CHAPTER_5_URO_VASCULAR: Section[] = [
+  sec(URO, 'urinary-retention', '5.5.1', 'Urinary retention and obstruction', [
+    p(
+      'Some urologic problems can be seen as surgical emergencies and if not treated promptly it can cause permanent damage. These include urinary obstruction/retention, nephrolithiasis, haematuria and swelling of the scrotum (e.g. torsion testis).',
+    ),
+    p('**Definition:**'),
+    ul(
+      '**Obstruction:** Partial or complete block of passage of urine through the renal system. It occurs anywhere from the renal calyces to the urethral meatus and it may be unilateral (clinically silent if the other kidney is functioning) or bilateral (requires urgent treatment).',
+      '**Retention:** inability to empty a full bladder. It can be classified in three types of urinary retention: acute, chronic and acute-on-chronic (when chronic retention of urine is suddenly complicated by acute retention of urine).',
+    ),
+    table(
+      ['Luminal', 'Mural', 'Extra-mural'],
+      [
+        ['Nephrolithiasis', 'Congenital stricture', 'Abdominal or pelvic mass/tumor'],
+        ['Blood clot', 'Acquired stricture', 'Retroperitoneal fibrosis'],
+        ['Trauma', 'Neuromuscular dysfunction', 'Benign Prostatic Hyperplasia (BPH)'],
+        ['Renal, ureteric or bladder tumor', 'Schistosomiasis', 'Prostate tumor'],
+        ['Posterior urethral valves in children', 'UTI in children', ''],
+      ],
+      'Causes for urinary tract obstruction',
+    ),
+    table(
+      ['Acute retention', 'Chronic retention'],
+      [
+        ['Acute prostatitis', 'Prostatic enlargement (BPH or carcinoma)'],
+        ['Urethral stricture, paraphimosis', 'Pelvic malignancy/uterine fibroids/ovarian cyst'],
+        ['Anticholinergics, alcohol', 'Rectal surgery'],
+        ['Urethral calculi', 'Diabetes Mellitus'],
+        ['Posterior urethral valves (in children)', 'Central nervous system disease (e.g. transverse myelitis, MS)'],
+        ['Post-operative (catheter, pain, inflammation, anaesthetics)', 'Herpes zoster infection'],
+        ['UTI, urethritis', ''],
+        ['Pelvic trauma', ''],
+        ['Neurologenic (cauda equine compression, PID)', ''],
+      ],
+      'Causes for acute and chronic retention',
+    ),
+    p('**Symptoms:**'),
+    ul(
+      'Acute retention: sudden onset of inability to pass urine with palpable tender, dysuria, haematuria, frequency',
+      'Chronic retention: insidious onset, palpable non tender bladder, overflow incontinence, signs of UTI, renal failure, nocturia, dribbling, poor stream, strangury (in case of BPH), signs of renal failure (confusion and uraemia)',
+    ),
+    p('**Signs:**'),
+    ul(
+      'Fever (if infection)',
+      'Palpable kidneys in hydronephrosis',
+      'Bladder containing 600ml (in case of acute retention), chronic retention (bladder capacity may be 1.5L)',
+      'Abdomen may be distended and tender at suprapubic region (chronic retention may be painless)',
+      'Haematuria (BPH, urinary tract cancer, trauma or strictures)',
+      'DRE: enlarged prostate, no perineal sensation (in case of cauda equine compression)',
+    ),
+    p('**Investigations:**'),
+    ul(
+      'FBC and Sickling',
+      'Renal function and electrolytes',
+      'Urine routine examination, culture and sensitivity (to do before catheter is inserted)',
+      'Serum PSA',
+      'Blood sugar',
+      'Imaging: renal USG, antegrade or retrograde ureterograms',
+    ),
+    p('**Treatment plan:**'),
+    ul(
+      'Relieve obstruction',
+      'Good analgesia (see 4.2. Pain protocol)',
+      'Start antibiotics IV: Ciprofloxacin 400mg BID for minimum 24-48H',
+      'Start IV fluids: NS since patient may pass large amounts of isotonic urine post catheterisation (leading to dehydration and hyponatraemia) → give amount of urine output + 500ml extra',
+      'Monitor fluid outflow',
+      'Investigate cause of obstruction/retention',
+      'Refer patient to urologist for further investigations and management',
+    ),
+    box(
+      'urgent',
+      'Acute retention',
+      'Tricks to help voiding: privacy in ward, ambulation, standing to void, sound of running taps',
+      'If not possible to urinate spontaneously → place a urethral catheter Ch 14 or 16',
+      'If catheterization traumatic → start IV antibiotics for 3 days*',
+      'If it all fails → place a suprapubic catheter**',
+      'Suprapubic cystostomy***',
+    ),
+    box('info', 'Chronic retention', 'Not as urgent, but drainage may help prevent renal failure'),
+    ul(
+      '* Antibiotics covering gram negative bacteria',
+      '** Only when palpable bladder (=full), to prevent perforation of bowels',
+      '*** Purpose: allow exploration of the bladder, insertion of a larger drainage tube, to allow suprapubic drainage of a non-palpable bladder',
+    ),
+    note(
+      'Only catheterize patients if there is pain, UTI or renal impairment. If haematuria present: place a 3-way catheter and do bladder irrigation. Any kind of catheter should be replaced every 2 weeks.',
+      'NOTE',
+    ),
+    see('pain', '4.2 Postoperative pain protocol'),
+    refs(HFCH, `${OHCM}, pp. 644-645`, `${WHO_2003}; “Chapter 9.1 Urinary tract and perineum”; pp. 9-1 to 9-6`, `${GHANA_STG}. Pp. 440-441`),
+  ]),
+
+  sec(URO, 'nephrolithiasis', '5.5.2', 'Nephrolithiasis', [
+    p(
+      '**Definition:** renal stones (calculi) consist of crystal aggregates (composition: oxalate, phosphate, magnesium ammonium phosphate, uric acid or cystine). Stones form in collecting ducts and may be deposited anywhere from the renal pelvis to the urethra, though classically: 1) Pelviureteric junction; 2) Pelvic brim (cross point with iliac arteries); 3) Vesicoureteric junction.',
+    ),
+    p('**Causes:**'),
+    ul(
+      'Nutritional (chocolate, tea, nuts, spinach)',
+      'Seasonal (variations in calcium and oxalate levels thought to be mediated by vitamin D)',
+      'Medication: loop diuretics, antacids, acetazolamide, corticosteroids, theophylline, aspirin, thiazides, allopurinol, vitamin C and D',
+      'Dehydration',
+      'Predisposing factors: recurrent UTI’s, metabolic abnormalities (e.g. hypercalcaemia, hyperuricaemia, hyperoxaluria), urinary tract abnormalities (hydronephrosis, urethral strictures), foreign bodies (e.g. stents, catheter)',
+    ),
+    p('**Symptoms:**'),
+    ul(
+      'May be asymptomatic',
+      'Colicky loin pain radiating to the groin or scrotum/labium majus, may also be described as waist/back pain',
+      'Nausea and vomiting',
+      'Haematuria, anuria or poor streaming may be also present',
+      'Dysuria, urgency, frequency, strangury, suprapubic pain',
+    ),
+    p('**Signs:** Fever (when infection); Unable to lie still, renal angle tenderness; Retention of urine, palpable bladder; Sterile pyuria'),
+    p('**Investigations:**'),
+    ul(
+      'FBC and Sickling',
+      'Renal function',
+      'Urine regular examinations or dipstick, culture and sensitivity',
+      'Imaging: Kidney-ureter-bladder (KUB) X-ray, USG, IV urogram, retrograde ureteropyelogram, CT-scan',
+      'Serum uric acid, calcium, magnesium and phosphate (consult urologist before doing this)',
+    ),
+    p('**Treatment plan:**'),
+    ol(
+      'Analgesia with IV Pethidine, IM Buscopan, PO Nospa and/or IM Diclofenac*',
+      'Start IV combination of antibiotics: Cefuroxime 500mg BID or Ciprofloxacin 500mg BID or Gentamicin 80mg BID or Ceftriaxone 1-2gr OD for minimal 48-72H**',
+      'Fluid restriction 1.5-2L/24H (may deteriorate situation), however avoid dehydration',
+      'Strain all urine to recover stone',
+      'If urine retention → place urethral catheter',
+      'Refer to urologist',
+    ),
+    ul('* See 4.2. Pain protocol', '** Switch to PO when clinically improved for 7 days total'),
+    danger('Urgent intervention when presence of infection and urinary tract obstruction.', 'NOTE'),
+    box('info', 'Stones <5mm', '90-95% pass spontaneously', '↑ Fluid intake'),
+    box('info', 'Stones > 5mm', 'Oral Nifedipine 10mg TID', 'Tamsulosine 0.4mg OD ± Prednisolon (reduce inflammation)*'),
+    box('info', 'If stone 0.5-2.5cm', 'Refer for ESWL'),
+    p('Open surgical intervention or nefrectomie rare.'),
+    p('ESWL = Extracorporal shockwave lithotripsy. *Most stones pass within 48H (> 80% after 30 days)'),
+    see('pain', '4.2 Postoperative pain protocol'),
+    refs(HFCH, `${OHCM}, pp. 640-641`, `${GHANA_STG}. Pp. 419-420`),
+  ]),
+
+  sec(URO, 'haematuria', '5.5.3', 'Haematuria', [
+    p(
+      '**Definition:** passage of blood in the urine. Haematuria must be fully investigated since it may herald the presence of serious conditions like described below. Severe bleeding from the bladder and prostate can lead to clot retention and acute urine retention. There are two types of haematuria: microscopic or macroscopic.',
+    ),
+    table(
+      ['Site', 'Causes'],
+      [
+        ['Renal', 'Renal cell carcinoma, Transitional cell carcinoma (TCC), nephrolithiasis, glomerulo/pyelonephritis, trauma, cysts'],
+        ['General', 'Glomerolonephritis, sickling cell, clotting disorder, medication (rimfapicine, antigoagulants, phenacetine), food'],
+        ['Bladder', 'Schistosomiasis, TCC or squamous cell carcinoma, calculus, cystitis, radiotherapy, tuberculosis, trauma'],
+        ['Prostate', 'BPH, carcinoma, prostatitis'],
+        ['Urethra', 'TCC, urethritis, corpus alienum ( e.g. catheter), trauma, calculus'],
+        ['Ureter', 'Calculus, TCC, infection'],
+      ],
+    ),
+    p('**Symptoms:**'),
+    ul(
+      'May be asymptomatic',
+      'Abdominal or loin pain, colicky flank pain (if nephrolithiasis)',
+      'Urine retention may be present (if blood clots blocking the way)',
+      'Dysuria, intermittent haematuria (bladder or kidney cancer)',
+    ),
+    p('**Signs:**'),
+    ul(
+      'Fever (if infection), pallor',
+      'Bright red blood in urine, possibly with clots',
+      'Dull percussion bladder region, abdominal mass, renal angle tenderness, suprapubic tenderness',
+      'DRE: pelvic mass, enlarged (painful) prostate',
+    ),
+    p('**Investigations:**'),
+    ul(
+      'FBC and GXM',
+      'Sickling, clotting screen',
+      'Urine regular examination, culture and sensitivity, urine for cytology',
+      'Imaging: KUB USG, IV urogram, cystoscopy',
+      'Biopsy: prostate, bladder (if suspected for carcinoma)',
+    ),
+    p('**Treatment plan:**'),
+    ol(
+      'Admit patient if septic, severe bleeding and/or hemodynamic unstable',
+      'Start IV fluids or stimulate enough oral intake',
+      'Good analgesia (see 4.2. Pain protocol)',
+      li(
+        'Treat cause of haematuria:',
+        'Nephrolithiasis: see 5.5.2. Nephrolithiasis',
+        'UTI: IV Ciprofloxacin 500mg BID or Ceftriaxone 1-2gr OD or Cefuroxime 750mg TID for minimal 48-72H*',
+        'Schistosomiasis: PO Praziquantel 40mg/kg single dose**',
+        'STI urethritis: [Ceftriaxone 250mg IM stat or PO Cefixime 400mg stat or PO Ciprofloxacin 500mg stat] AND PO [Doxycycline 100mg BID or Erythromycin 500mg QID] for 7 days or Azithromycin 1gr stat',
+      ),
+      'Pass a wide bore urethral catheter Ch 20 (or above) or pass a 3-way catheter for irrigation',
+      'Refer for urologist; Eventual surgical intervention',
+    ),
+    ul('* Switch to PO if clinical improvement for 7 days', '** Same for adults and children'),
+    danger('Do not give Tranexamine Acid before having an urinary irrigation system working.', 'NOTE'),
+    see('nephrolithiasis', '5.5.2 Nephrolithiasis'),
+    refs(HFCH, 'Van Agtmael et al; Acute Boekje 2009; Editors Van Zuiden; Alphen aan de Rijn (The Netherlands); pp. 86-87'),
+  ]),
+
+  sec(URO, 'scrotum', '5.5.4', 'Swelling scrotum', [
+    p(
+      '**Definition:** the scrotum includes the scrotal sac, tunica vaginalis, testis, vas deferens, vessels (pampiniform plexus and testicular artery) and the epididymis. A swelling can occur in all of those structures, which can be benign or even be seen as an emergency (e.g. torsion testis).',
+    ),
+    danger('Torsion testis: surgical intervention within 6H of onset.'),
+    table(
+      ['Structure / cause', 'Symptoms', 'Signs'],
+      [
+        ['**Scrotal sac:** Epidermoidcyst or sebaceous cyst, abscess', 'Unilateral scrotal skin swelling, may be painful (if abscess)', 'Skin swelling, not attached to content of scrotum, fluctuating (if abscess)'],
+        [
+          '**Scrotal sac:** Fournier-gangrene',
+          'Scrotal swelling (uni- or bilateral), pain out of proportion with physical findings',
+          'Edematous scrotum, discoloured scrotal skin, feculent odour, fever, tachycardia, crepitus',
+        ],
+        ['**Scrotal sac:** Idiopatic scrotal edema; Lymphatic filariasis', 'Bilateral scrotal swelling', 'Thickened scrotal skin'],
+        [
+          '**Tunica vaginalis:** Inguino-scrotal hernia',
+          'Scrotal swelling (uni- or bilateral), may be painful (if incarcerated /strangulated and may be accompanied with signs of intestinal obstruction, see 5.4.6. Intestinal Obstruction)',
+          '(Ir)reducable swelling coming from groin, can reach the scrotum but is not attached to testis',
+        ],
+        [
+          '**Tunica vaginalis:** Hydrocele',
+          'Painless soft swelling (unilateral), fluctuant, heavy scrotum',
+          'Swelling attached/covering testis (may go all the way to the groin in case of communicable hydrocele), irreducible, transillumination',
+        ],
+        ['**Testis:** Tumor', 'Slow growing testis swelling, painless', 'Irregular swelling attached to testis, firm, no enlarged lymph nodes'],
+        ['**Testis:** Orchitis', 'Gradual pain testis, swelling (unilateral), dysuria, penile discharge/pain/itch*', 'Uniformly enlarged testis, painful, soft'],
+        [
+          '**Testis:** Torsion testis; Torsion appendix testis (rare)',
+          'Acute pain testis (normally unilateral) which goes to the groin, swelling, nausea, vomiting',
+          'Extreme pain, swelling of testes, testis drawn upwards, erythema may be seen',
+        ],
+        ['**Testis:** Trauma', 'Acute pain and swelling testis', 'Painful, swollen testis, hematoma may be seen, active bleeding'],
+        ['**Vas deferens:** Spermatoecele', 'Painless soft swelling (unilateral)', 'Swelling which is well defined and not attached to testis'],
+        ['**Vessels:** Varicocoele', 'Swollen scrotum, soft and not painful, subfertility', 'Enlarged pampiniform plexus, painless'],
+        [
+          '**Epididymis:** Epididymitis',
+          'Gradual pain testis, swelling (unilateral), dysuria, penile discharge/pain/itch*',
+          'Painful swollen testis (begin stadium epididymis may be differentiated from testis), fever',
+        ],
+        ['**Epididymis:** Epididymal cyst/tumor', 'Small swelling (unilateral) attached to epididymis, painless', 'Swelling attached to epididymis and loose from surroundings'],
+      ],
+    ),
+    p('*Think of sexual transmitted diseases = STI or UTI as a cause'),
+    p('**Investigations:**'),
+    ul(
+      'FBC',
+      'Blood sugar',
+      'Urine regular exam (first catch of urine preferred to midstream urine)',
+      'Blood culture and sensitivity (if septic)',
+      'Penile swab (STI) and HIV screening',
+      'Wound swab (in case of Fournier or abscess)',
+      'USG scrotum (structure and size of testicle and epididymis, hydrocele or hernia seen, Doppler for torsion)',
+      'b-hCG (if suspected testis tumor, for follow-up)',
+      'Filariasis test',
+    ),
+    p('**Treatment plan:**'),
+    p('Treat infectious cause of swelling (See Appendix 6.2.):'),
+    ul(
+      'If acute epididymo-orchitis 2nd to STI: PO [Ciprofloxacin 500mg BID or Norfloxacin 400mg BID or Levofloxacin 500mg OD] for 10-14 days AND PO [Doxycycline 100mg BID for 4weeks or Azithromycin 250mg for 3 days]',
+      'If acute epididymitis: PO [Ceftriaxone 250mg or Cefixime 400mg or Ciprofloxacin 500mg as a single dose] AND PO [Doxycycline 100mg BID or Erythromycin 500mg QID] for 10 days or PO Azithromycin 1gr as a single dose',
+      'For Fournier gangrene: IV antibiotics: [Amoxicillin/clavulanate 1.2gr TID or Cefuroxime 500-750mg TID or Gentamicin 80mg BID] AND Metronidazole 500mg TID for minimum 72H',
+    ),
+    ul(
+      'Good analgesia (see Pain protocol) for 5-7 days',
+      'Elevation of scrotum in case of edema',
+      'Elective operation: hydrocele, reducable inguino-scrotal hernia, varicocoele, spermatocoele (only if patient has complaints), epididymectomy (in case of chronic epididymitis without effect of antibiotics and analgesia)',
+      '**Emergency intervention:** torsion testis, irreducible hernia, trauma, abscess and Fournier gangrene',
+      'Scrotal tumor: refer to urologist for further investigations (biopsy) and management',
+    ),
+    warn(
+      'If STI also treat partner (see 5.4.5. Gynaecologic/Obstetric). Hydrocele in children <1 year often resolves without intervention. Manual reposition of the torsio testis may be attempted if surgery is delayed (right testis anticlockwise, left testis clockwise). Surgical intervention for torsion testis within 6H of onset.',
+      'NOTE',
+    ),
+    see('gynaecological', '5.4.7 Gynaecologic / obstetric'),
+    see('antibiotics', 'Appendix 6.2 Antibiotics versus Pathogens'),
+    refs(
+      'M.F. van Driel; Urology; Swelling of the scrotum 2008; Second edition; Bohn Stafleu van Loghum; pp. 103-110',
+      `${WHO_2003}; “Chapter 9.1 Urinary tract and perineum”; pp. 9-1 to 9-6`,
+      `${GHANA_STG}. Pp. 423-420`,
+    ),
+  ]),
+
+  sec(
+    VASC,
+    'arterial-occlusion',
+    '5.6.1',
+    'Acute arterial occlusion (AAO)',
+    [
+      p(
+        '**Definition:** sudden obstruction in the arterial flow to an extremity due to an embolism, thrombosis, trauma, aortic dissection (will not be discussed in this chapter) or compartment syndrome (see 5.2. Trauma). Hence AAO must be recognized promptly from clinical presentation. Related complications are very serious and may result in morbidity with loss of limbs and even mortality.',
+      ),
+      see('circulation', 'Compartment syndrome and fasciotomy (5.2.1 Circulation)'),
+      box(
+        'info',
+        'Embolism (fat, thrombi, tumour): source of embolus',
+        'Heart: Artherosclerotic heart disease; Coronary artery disease; Acute MI; Atrial fibrillation; Valvular disease (rheumatic, degenerative, congenital, bacterial, prosthetic)',
+        'Artery-to-artery: Aneurysm; Atherosclerotic plaque; Idiopathic',
+        'Paradoxal',
+      ),
+      box(
+        'info',
+        'Arterial thrombosis',
+        'Low flow states: Carotic-coronary fistula; Hypovolaemia; Hypotension',
+        'Hyper coagulation: Polycythaemia; Factor V Leiden; Antithrombin III, Proteine C and S deficiencies',
+        'Atherosclerosis',
+        'Vascular grafts',
+        'Intimal hyperplasia',
+      ),
+      box(
+        'info',
+        'Arterial trauma',
+        'Penetrating trauma: Direct vessel injury; Indirect injury; Missile emboli; Proximity of injury to arteries',
+        'Blunt: Intimal flap; Spasm',
+        'Iatrogenic: Intimal flap; Dissection; Presence of medical device',
+      ),
+      box(
+        'info',
+        'Other',
+        'Drug abuse: Intra arterial administration; Drug toxicity; Contaminant; Microembolization',
+        'Outflow venous occlusion: Compartment syndrome; Phlegmasia caeruea dolens',
+        'Drug effect (ergot)',
+        'Raynaud’s disease',
+      ),
+      p('**Symptoms (6 P’s):**'),
+      ul(
+        'Acute onset of Pain (depend on the location of the embolism)',
+        'Paraesthesia, Pallor, Pulselessness, Paralysis or Poikilothermia',
+        'Prolonged ischaemia leads to cellular swelling and muscle stiffness',
+      ),
+      p('**Signs:**'),
+      ul(
+        'Cold and pale extremity',
+        'Pain (mainly at night), tingling, oedema',
+        'Peripheral pulsations decreased or absent (level is dependent on which artery)',
+        'If chronic arterial problem: skin changes, ulceration, muscle, oedema, muscle atrophy, gangrene',
+      ),
+      p('**Investigation:**'),
+      ul(
+        'FBC, Sickling, clotting profile',
+        'Arterial blood gases',
+        'Blood glucose',
+        'Renal function, urine myoglobulin, creatinine phosphokinase',
+        'ECG',
+        'Imaging: chest X-ray, arteriography, duplex scan',
+      ),
+      p('**Treatment plan: clinical impression of acute arterial occlusion**'),
+      box('critical', 'Operative', 'Emergency embolectomy', 'Thrombolysis (TPA, urokinase, streptokinase)'),
+      p('**Non-operative:**'),
+      ...anticoagulation(),
+    ],
+    { tone: 'critical' },
+  ),
+
+  sec(VASC, 'vte', '5.6.2', 'Venous thromboembolism', [
+    p('There are two types of thromboembolism: deep vein thrombosis and pulmonary embolism.'),
+    p('**Deep vein thrombosis (DVT)**'),
+    ul(
+      '**Symptoms:** painful, swollen limb, acute onset.',
+      '**Signs:** swollen, oedematous limb associated with tenderness, differential warmth and low grade fever.',
+      '**Investigation:** D-dimer test; Imaging: doppler scan, duplex and colour duplex, plethysmography, venography',
+    ),
+    warn('Do not do D-dimer in pregnancy (expected to always be high).', 'NOTE'),
+    p('**Pulmonary embolism (PE)**'),
+    p('**Symptoms:** acute onset shortness of breath, pleuritic-type pain, haemoptysis'),
+    table(
+      ['Criterion', 'Points'],
+      [
+        ['Clinically suspected DVT', '3'],
+        ['Alternative diagnosis less likely than PE', '3'],
+        ['Tachycardia', '1.5'],
+        ['Immobilization/surgery in previous 4wks', '1.5'],
+        ['History of DVT/PE', '1.5'],
+        ['Haemoptysis', '1'],
+        ['Malignancy (treatment <6months)', '1'],
+      ],
+      'Wells score for PE',
+    ),
+    ul(
+      'Score > 6 pts: high (chance 59%); score 2-6 pts: moderate (chance 29%); score < 2 pts: low (chance 15%)',
+      'If score > 4 pts: PE likely, consider diagnostic imaging; if score < 4 pts: PE unlikely, consider D-dimer to rule out PE',
+    ),
+    table(
+      ['High risk (DVT 40-80%, PE 1-10%)', 'Moderate risk 10-40% (DVT 40-80%, PE 0.1-1%)', 'Low risk <10% (DVT 40-80%, PE 0.01%)'],
+      [
+        ['Fracture or major orthopaedic surgery', 'Other major surgery', 'Minor surgery <30min; no other risk factor other than age'],
+        [
+          'Major pelvic or abdominal operation for cancer',
+          'Major illness (eg. heart and lung disease, cancer)',
+          'Major surgery >30min; age <40yrs; no other risk factors Minor trauma or medical illness',
+        ],
+        [
+          'Major surgery, trauma or illness; previous DVT, PE or thrombophilia',
+          'Minor trauma, surgery or illness; History of DVT, PE or thrombophilia',
+          'Minor trauma or medical illness',
+        ],
+        ['Lower limb paralysis', 'Age above 45yrs', ''],
+        ['Major limb amputation', '', ''],
+      ],
+      'Risk factors',
+    ),
+    p('**Treatment plan**'),
+    box(
+      'info',
+      'Prophylaxis',
+      'Stimulate early mobilisation after surgery, elevate affected limb, graded compression stockings, effective pain relief, deep breathing exercises',
+      'Unfractioned Heparin SC 5000U BID or Low molecular weight heparin (LMWH): Dalteparin SC 2500-5000U OD or Enoxaparin SC 2000-4000U OD',
+    ),
+    p('**Established DVT/PE**'),
+    ul('Elevation of the affected limb, graded compression stockings', '1. Perform ABC assessment', '2. Support patient where needed (e.g. O₂, IV fluids)'),
+    p('**Anticoagulant therapy**'),
+    ...anticoagulation(),
+    refs(
+      HFCH,
+      'K.K. Teo 2019; MSD Manual; “Acute Peripheral Arterial Occlusion”; Merck Sharp & Dohme Corp. Inc., Kenilworth, USA; (viewed 24 July 2019); https://www.msdmanuals.com/professional/cardiovascular-disorders/peripheral-arterial-disorders/acute-peripheral-arterial-occlusion',
+    ),
+  ]),
+]

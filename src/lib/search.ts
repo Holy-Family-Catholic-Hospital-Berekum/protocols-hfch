@@ -1,4 +1,4 @@
-import type { Block, Protocol } from '../types/protocol'
+import type { Block, Protocol, Section } from '../types/protocol'
 import { stripRichText } from './richTextParse'
 import { getCategory } from '../config/categories'
 
@@ -22,7 +22,16 @@ function blockText(block: Block): string[] {
       return [block.title]
     case 'flow':
       return block.nodes.flatMap((n) => [n.title, ...(n.items ?? [])])
+    case 'figure':
+      return [block.caption, block.note ?? '']
+    case 'references':
+      return []
   }
+}
+
+/** Plain lower-case text of one section, for searching inside a guideline. */
+export function sectionText(section: Section): string {
+  return stripRichText([section.number ?? '', section.title, ...section.blocks.flatMap(blockText)].join(' ')).toLowerCase()
 }
 
 const cache = new WeakMap<Protocol, { title: string; meta: string; body: string }>()

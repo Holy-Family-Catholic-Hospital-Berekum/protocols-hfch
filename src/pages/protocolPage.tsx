@@ -14,6 +14,8 @@ import {
 import { useAuth } from '../auth/authContext'
 import { useProtocolList } from '../lib/protocolsContext'
 import { ProtocolView } from '../components/protocol/protocolView'
+import { HandbookContents } from '../components/protocol/handbook'
+import { isHandbook } from '../components/protocol/anchors'
 import { Timer } from '../components/timer'
 import { VerifyDialog } from '../components/verifyDialog'
 import { getCategory } from '../config/categories'
@@ -151,8 +153,15 @@ export function ProtocolPage() {
         </div>
       </ProtocolHeader>
 
-      {hasStructured ? (
-        <ProtocolView sections={protocol.sections} changedSections={protocol.changedSections} availableProtocols={available} />
+      {hasStructured && isHandbook(protocol.sections) ? (
+        <HandbookContents protocolId={protocol.id} sections={protocol.sections} />
+      ) : hasStructured ? (
+        <ProtocolView
+          sections={protocol.sections}
+          changedSections={protocol.changedSections}
+          availableProtocols={available}
+          originalUrl={original?.url}
+        />
       ) : firstPdf ? (
         <div className="pdf-frame glass">
           <iframe src={firstPdf.url} title={protocol.title} />

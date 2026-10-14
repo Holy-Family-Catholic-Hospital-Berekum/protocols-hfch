@@ -11,7 +11,7 @@ export interface AnchorInfo {
 export function buildAnchorIndex(sections: Section[]): Map<string, AnchorInfo> {
   const index = new Map<string, AnchorInfo>()
   sections.forEach((section, si) => {
-    index.set(section.id, { label: `${si + 1}. ${section.title}` })
+    index.set(section.id, { label: `${section.number ?? `${si + 1}.`} ${section.title}` })
     for (const block of section.blocks) {
       if (block.type !== 'flow') continue
       let step = 0
@@ -27,6 +27,21 @@ export function buildAnchorIndex(sections: Section[]): Map<string, AnchorInfo> {
     }
   })
   return index
+}
+
+/** Maps every anchor (section ids and flow step ids) to the id of the section containing it. */
+export function buildSectionOf(sections: Section[]): Map<string, string> {
+  const map = new Map<string, string>()
+  for (const s of sections) {
+    map.set(s.id, s.id)
+    for (const b of s.blocks) if (b.type === 'flow') b.nodes.forEach((n) => map.set(n.id, s.id))
+  }
+  return map
+}
+
+/** True when sections are grouped into chapters: long guidelines are shown as a handbook. */
+export function isHandbook(sections: Section[] | undefined): boolean {
+  return (sections ?? []).some((s) => !!s.chapter)
 }
 
 export function anchorDomId(id: string) {

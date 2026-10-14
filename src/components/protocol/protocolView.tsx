@@ -2,12 +2,13 @@ import { useEffect, useMemo, useRef, useState, type RefObject } from 'react'
 import { Clock, Sparkles } from 'lucide-react'
 import type { Section } from '../../types/protocol'
 import { BlockView, type BlockContext } from './blocks'
-import { JUMP_EVENT, anchorDomId, buildAnchorIndex, scrollToAnchor } from './anchors'
+import { JUMP_EVENT, anchorDomId, buildAnchorIndex, buildSectionOf, scrollToAnchor } from './anchors'
 
 interface Props {
   sections: Section[]
   changedSections?: string[]
   availableProtocols: Map<string, string>
+  originalUrl?: string
 }
 
 /**
@@ -21,14 +22,7 @@ function useActiveSection(sections: Section[], navRef: RefObject<HTMLElement | n
   const pinned = useRef<string | null>(null)
 
   // Flow steps live inside sections; a jump to a step selects its section.
-  const sectionOf = useMemo(() => {
-    const map = new Map<string, string>()
-    for (const s of sections) {
-      map.set(s.id, s.id)
-      for (const b of s.blocks) if (b.type === 'flow') b.nodes.forEach((n) => map.set(n.id, s.id))
-    }
-    return map
-  }, [sections])
+  const sectionOf = useMemo(() => buildSectionOf(sections), [sections])
 
   useEffect(() => {
     let frame = 0
@@ -80,12 +74,51 @@ function useActiveSection(sections: Section[], navRef: RefObject<HTMLElement | n
   return active
 }
 
-export function ProtocolView({ sections, changedSections = [], availableProtocols }: Props) {
+/** One section with its header and blocks. Shared by the single-page and handbook layouts. */
+export function SectionCard({
+  section,
+  number,
+  updated,
+  ctx,
+}: {
+  section: Section
+  number: string
+  updated: boolean
+  ctx: BlockContext
+}) {
+  return (
+    <section id={anchorDomId(section.id)} data-section={section.id} className={`section tone-${section.tone ?? 'neutral'}`}>
+      <header className="section-head">
+        <span className="section-num">{number}</span>
+        <h2>{section.title}</h2>
+        <div className="section-badges">
+          {section.timeTarget && (
+            <span className="badge time">
+              <Clock size={14} aria-hidden /> {section.timeTarget}
+            </span>
+          )}
+          {updated && (
+            <span className="badge updated">
+              <Sparkles size={14} aria-hidden /> Updated
+            </span>
+          )}
+        </div>
+      </header>
+      <div className="section-body">
+        {section.blocks.map((block, j) => (
+          <BlockView key={j} block={block} ctx={ctx} />
+        ))}
+      </div>
+    </section>
+  )
+}
+
+export function ProtocolView({ sections, changedSections = [], availableProtocols, originalUrl }: Props) {
   const anchors = useMemo(() => buildAnchorIndex(sections), [sections])
   const navRef = useRef<HTMLElement>(null)
   const active = useActiveSection(sections, navRef)
   const tocRef = useRef<HTMLDivElement>(null)
-  const ctx: BlockContext = { anchors, availableProtocols }
+  const ctx: BlockContext = { anchors, availableProtocols, jump: scrollToAnchor, originalUrl }
 
   // Keep the active chip visible in the horizontal contents bar. Only the bar itself is scrolled:
   // scrollIntoView() would also scroll the page and, with the sticky bar, yank the reader back down.
@@ -119,34 +152,13 @@ export function ProtocolView({ sections, changedSections = [], availableProtocol
 
       <div className="sections">
         {sections.map((section, i) => (
-          <section
+          <SectionCard
             key={section.id}
-            id={anchorDomId(section.id)}
-            data-section={section.id}
-            className={`section tone-${section.tone ?? 'neutral'}`}
-          >
-            <header className="section-head">
-              <span className="section-num">{i + 1}</span>
-              <h2>{section.title}</h2>
-              <div className="section-badges">
-                {section.timeTarget && (
-                  <span className="badge time">
-                    <Clock size={14} aria-hidden /> {section.timeTarget}
-                  </span>
-                )}
-                {changedSections.includes(section.id) && (
-                  <span className="badge updated">
-                    <Sparkles size={14} aria-hidden /> Updated
-                  </span>
-                )}
-              </div>
-            </header>
-            <div className="section-body">
-              {section.blocks.map((block, j) => (
-                <BlockView key={j} block={block} ctx={ctx} />
-              ))}
-            </div>
-          </section>
+            section={section}
+            number={String(i + 1)}
+            updated={changedSections.includes(section.id)}
+            ctx={ctx}
+          />
         ))}
       </div>
     </div>

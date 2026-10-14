@@ -134,6 +134,36 @@ function SectionEditor({
               />
             </label>
           </div>
+          <div className="row-fields">
+            <label className="lbl">
+              Number (optional)
+              <input
+                className="input"
+                placeholder="e.g. 5.4.2"
+                value={section.number ?? ''}
+                onChange={(e) => onChange({ ...section, number: e.target.value || undefined })}
+              />
+            </label>
+            <label className="lbl">
+              Chapter (long guidelines)
+              <input
+                className="input"
+                placeholder="e.g. 5. Surgical emergencies"
+                value={section.chapter ?? ''}
+                onChange={(e) => onChange({ ...section, chapter: e.target.value || undefined })}
+              />
+            </label>
+            <label className="lbl">
+              Subchapter (optional)
+              <input
+                className="input"
+                placeholder="e.g. 5.4 Abdominal"
+                value={section.subchapter ?? ''}
+                onChange={(e) => onChange({ ...section, subchapter: e.target.value || undefined })}
+              />
+            </label>
+          </div>
+          <div className="hint">Giving sections a chapter shows the protocol as a handbook: a contents page, one section per screen.</div>
 
           {section.blocks.map((block, i) => (
             <div key={`${nonce}-${i}`} className="block-edit">

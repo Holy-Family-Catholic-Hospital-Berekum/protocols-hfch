@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom'
 import {
   AlertTriangle,
+  BookOpen,
+  ExternalLink,
+  Image as ImageIcon,
   ArrowRight,
   CornerDownRight,
   Info,
@@ -13,18 +16,22 @@ import {
 } from 'lucide-react'
 import type { Block, Branch, FlowNode } from '../../types/protocol'
 import { RichText } from '../richText'
-import { anchorDomId, scrollToAnchor, type AnchorInfo } from './anchors'
+import { anchorDomId, type AnchorInfo } from './anchors'
 
 export interface BlockContext {
   anchors: Map<string, AnchorInfo>
   /** Protocol ids the current user can open. */
   availableProtocols: Map<string, string>
+  /** Go to a section or flow step: scrolls on a single page, switches section in a handbook. */
+  jump: (anchorId: string) => void
+  /** URL of the uploaded original document, for figure cards. */
+  originalUrl?: string
 }
 
 function BranchButton({ branch, ctx }: { branch: Branch; ctx: BlockContext }) {
   const target = ctx.anchors.get(branch.target)
   return (
-    <button type="button" className={`branch tone-${branch.tone}`} onClick={() => scrollToAnchor(branch.target)}>
+    <button type="button" className={`branch tone-${branch.tone}`} onClick={() => ctx.jump(branch.target)}>
       <span className="branch-label">{branch.label}</span>
       {target && <span className="branch-target">Go to {target.label}</span>}
       {branch.note && (
@@ -76,7 +83,7 @@ function FlowBlock({ nodes, ctx }: { nodes: FlowNode[]; ctx: BlockContext }) {
                 </div>
               )}
               {node.goto && (
-                <button type="button" className="flow-goto" onClick={() => scrollToAnchor(node.goto!)}>
+                <button type="button" className="flow-goto" onClick={() => ctx.jump(node.goto!)}>
                   <Repeat size={16} aria-hidden /> Then go back to {goto?.label ?? 'the rhythm check'}
                 </button>
               )}
@@ -224,7 +231,7 @@ export function BlockView({ block, ctx }: { block: Block; ctx: BlockContext }) {
       ) : null
       if (block.anchor) {
         return (
-          <button type="button" className="b-link" onClick={() => scrollToAnchor(block.anchor!)}>
+          <button type="button" className="b-link" onClick={() => ctx.jump(block.anchor!)}>
             {condition}
             <span className="b-link-label">
               <ArrowRight size={18} aria-hidden /> {block.label}
@@ -275,5 +282,45 @@ export function BlockView({ block, ctx }: { block: Block; ctx: BlockContext }) {
 
     case 'flow':
       return <FlowBlock nodes={block.nodes} ctx={ctx} />
+
+    case 'figure': {
+      const href = ctx.originalUrl ? `${ctx.originalUrl}${block.page ? `#page=${block.page}` : ''}` : undefined
+      return (
+        <div className="b-figure">
+          <ImageIcon size={22} className="b-figure-icon" aria-hidden />
+          <div className="b-figure-body">
+            <div className="b-figure-caption">{block.caption}</div>
+            {block.note && (
+              <div className="b-figure-note">
+                <RichText text={block.note} />
+              </div>
+            )}
+            {href ? (
+              <a className="b-figure-link" href={href} target="_blank" rel="noopener noreferrer">
+                <ExternalLink size={15} aria-hidden /> Open figure in original{block.page ? ` (page ${block.page})` : ''}
+              </a>
+            ) : (
+              <span className="muted small">
+                Figure in the original document{block.page ? `, page ${block.page}` : ''} (original not uploaded yet)
+              </span>
+            )}
+          </div>
+        </div>
+      )
+    }
+
+    case 'references':
+      return (
+        <details className="b-refs">
+          <summary>
+            <BookOpen size={16} aria-hidden /> References ({block.items.length})
+          </summary>
+          <ul>
+            {block.items.map((r, i) => (
+              <li key={i}>{r}</li>
+            ))}
+          </ul>
+        </details>
+      )
   }
 }

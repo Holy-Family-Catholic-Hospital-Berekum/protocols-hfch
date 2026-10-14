@@ -9,6 +9,7 @@ import { PendingPage } from './pages/pendingPage'
 import { HomePage } from './pages/homePage'
 import { ProtocolPage } from './pages/protocolPage'
 import { HistoryPage, VersionPage } from './pages/historyPage'
+import { HandbookSectionPage } from './pages/handbookSectionPage'
 import { UsersPage } from './pages/admin/usersPage'
 import { EditorPage } from './pages/admin/editor/editorPage'
 
@@ -40,6 +41,7 @@ function Gate() {
         <Route element={<AppShell />}>
           <Route index element={<HomePage />} />
           <Route path="p/:id" element={<ProtocolPage />} />
+          <Route path="p/:id/s/:sectionId" element={<HandbookSectionPage />} />
           <Route path="p/:id/history" element={<HistoryPage />} />
           <Route path="p/:id/history/:versionId" element={<VersionPage />} />
           <Route path="admin/users" element={<AdminOnly><UsersPage /></AdminOnly>} />

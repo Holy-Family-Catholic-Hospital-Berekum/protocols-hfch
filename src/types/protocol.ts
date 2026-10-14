@@ -53,12 +53,24 @@ export type Block =
   | { type: 'link'; protocolId?: string; anchor?: string; label: string; condition?: RichText }
   | { type: 'contacts'; title: string; people: { name: string; phone: string }[] }
   | { type: 'flow'; nodes: FlowNode[] }
+  /** An illustration kept in the original document; opens the uploaded original at that page. */
+  | { type: 'figure'; caption: string; page?: number; note?: RichText }
+  /** Source citations, shown collapsed. */
+  | { type: 'references'; items: string[] }
 
 export type BlockType = Block['type']
 
 export interface Section {
   id: string
   title: string
+  /** Display number from the source document, e.g. "5.4.2". */
+  number?: string
+  /**
+   * Grouping for long guidelines (handbook layout), e.g. chapter "5. Surgical emergencies",
+   * subchapter "5.4 Abdominal". A protocol whose sections have chapters is shown as a handbook.
+   */
+  chapter?: string
+  subchapter?: string
   tone?: Tone
   /** e.g. "within 10 min" */
   timeTarget?: string
