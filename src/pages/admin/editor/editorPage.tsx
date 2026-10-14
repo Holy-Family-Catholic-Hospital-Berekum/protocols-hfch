@@ -28,7 +28,7 @@ import {
   uploadAttachment,
   verifyAndPublish,
 } from '../../../lib/protocols'
-import { CATEGORIES } from '../../../config/categories'
+import { CATEGORIES, getCategory } from '../../../config/categories'
 import { buildAnchorIndex } from '../../../components/protocol/anchors'
 import { ProtocolView } from '../../../components/protocol/protocolView'
 import { VerifyDialog } from '../../../components/verifyDialog'
@@ -257,6 +257,7 @@ export function EditorPage() {
 
   const validate = (): string | null => {
     if (!content.title.trim()) return 'Please give the protocol a title.'
+    if (!content.category) return 'Please choose a department (Details tab).'
     const anchors = buildAnchorIndex(content.sections)
     for (const s of content.sections) {
       if (!s.title.trim()) return 'Every section needs a title.'
@@ -328,7 +329,7 @@ export function EditorPage() {
 
   return (
     <div className="editor">
-      <button type="button" className="back" onClick={() => (!dirty || confirm('Discard unsaved changes?')) && navigate(-1)}>
+      <button type="button" className="back" onClick={() => (!dirty || confirm('Discard unsaved changes?')) && ((window.history.state as { idx?: number } | null)?.idx ? navigate(-1) : navigate('/', { replace: true }))}>
         <ArrowLeft size={18} aria-hidden /> Back
       </button>
       <h1>{routeId ? 'Edit protocol' : 'New protocol'}</h1>
@@ -355,8 +356,15 @@ export function EditorPage() {
           </label>
           <div className="row-fields">
             <label className="lbl">
-              Category
-              <select className="input" value={content.category} onChange={(e) => update({ category: e.target.value })}>
+              Department
+              <select
+                className="input"
+                value={content.category ? getCategory(content.category).id : ''}
+                onChange={(e) => update({ category: e.target.value })}
+              >
+                <option value="" disabled>
+                  Choose…
+                </option>
                 {CATEGORIES.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}

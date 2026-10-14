@@ -43,10 +43,14 @@ export function ProtocolView({ sections, changedSections = [], availableProtocol
   const tocRef = useRef<HTMLDivElement>(null)
   const ctx: BlockContext = { anchors, availableProtocols }
 
-  // Keep the active chip visible in the horizontal contents bar.
+  // Keep the active chip visible in the horizontal contents bar. Only the bar itself is scrolled:
+  // scrollIntoView() would also scroll the page and, with the sticky bar, yank the reader back down.
   useEffect(() => {
-    const chip = tocRef.current?.querySelector<HTMLElement>(`[data-toc="${active}"]`)
-    chip?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' })
+    const bar = tocRef.current
+    const chip = bar?.querySelector<HTMLElement>(`[data-toc="${active}"]`)
+    if (!bar || !chip || bar.scrollWidth <= bar.clientWidth) return
+    const left = chip.offsetLeft - bar.offsetLeft - (bar.clientWidth - chip.clientWidth) / 2
+    bar.scrollTo({ left, behavior: 'smooth' })
   }, [active])
 
   return (

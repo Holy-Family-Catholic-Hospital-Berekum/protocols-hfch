@@ -1,7 +1,6 @@
 import { useState, type ReactNode } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import {
-  ArrowLeft,
   BadgeCheck,
   EyeOff,
   FileText,
@@ -60,7 +59,6 @@ export function ProtocolHeader({ content, children }: { content: ProtocolContent
 
 export function ProtocolPage() {
   const { id } = useParams()
-  const navigate = useNavigate()
   const { profile, user } = useAuth()
   const isAdmin = profile?.role === 'admin'
   const { protocols, loading, available } = useProtocolList()
@@ -95,9 +93,6 @@ export function ProtocolPage() {
 
   return (
     <article className="protocol">
-      <button type="button" className="back" onClick={() => (window.history.length > 1 ? navigate(-1) : navigate('/'))}>
-        <ArrowLeft size={18} aria-hidden /> Back
-      </button>
 
       {isDraft && (
         <div className="draft-banner">

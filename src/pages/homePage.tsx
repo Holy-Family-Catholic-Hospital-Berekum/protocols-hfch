@@ -1,13 +1,12 @@
-import { useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { ChevronRight, DownloadCloud, FilePlus2, Loader2, Search, Sparkles, UserCheck, X } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import { ChevronRight, DownloadCloud, Loader2, Search, Sparkles, X } from 'lucide-react'
 import { useAuth } from '../auth/authContext'
 import { useProtocolList } from '../lib/protocolsContext'
 import { searchProtocols } from '../lib/search'
 import { CATEGORIES, getCategory } from '../config/categories'
 import { daysSince, formatDate } from '../lib/format'
 import { importStarterProtocols } from '../lib/protocols'
-import { useUsers } from '../lib/users'
 import { STARTER_PROTOCOLS } from '../data/starterProtocols'
 import type { Protocol } from '../types/protocol'
 
@@ -47,18 +46,25 @@ export function HomePage() {
   const { profile, user } = useAuth()
   const isAdmin = profile?.role === 'admin'
   const { protocols, loading, error } = useProtocolList()
-  const { users } = useUsers(isAdmin)
-  const navigate = useNavigate()
+  const location = useLocation()
+  const searchRef = useRef<HTMLInputElement>(null)
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<string | null>(null)
   const [importing, setImporting] = useState(false)
   const [importMsg, setImportMsg] = useState('')
 
-  const pendingCount = users.filter((u) => u.role === 'pending').length
+  // Bottom-nav "Search" lands here with focusSearch in the navigation state.
+  const focusSearch = (location.state as { focusSearch?: number } | null)?.focusSearch
+  useEffect(() => {
+    if (!focusSearch) return
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    searchRef.current?.focus({ preventScroll: true })
+  }, [focusSearch])
+
   const missingStarters = isAdmin && !loading && Object.keys(STARTER_PROTOCOLS).some((id) => !protocols.some((p) => p.id === id))
 
   const results = useMemo(() => {
-    const inCategory = category ? protocols.filter((p) => p.category === category) : protocols
+    const inCategory = category ? protocols.filter((p) => getCategory(p.category).id === category) : protocols
     return searchProtocols(inCategory, query)
   }, [protocols, query, category])
 
@@ -71,15 +77,15 @@ export function HomePage() {
     [protocols],
   )
 
-  const usedCategories = CATEGORIES.filter((c) => protocols.some((p) => p.category === c.id))
   const searching = query.trim().length > 0 || category !== null
 
   const grouped = useMemo(() => {
     const map = new Map<string, Protocol[]>()
     for (const p of results) {
-      const list = map.get(p.category) ?? []
+      const id = getCategory(p.category).id
+      const list = map.get(id) ?? []
       list.push(p)
-      map.set(p.category, list)
+      map.set(id, list)
     }
     return CATEGORIES.filter((c) => map.has(c.id)).map((c) => ({ category: c, items: map.get(c.id)! }))
   }, [results])
@@ -113,6 +119,7 @@ export function HomePage() {
         <div className="search glass">
           <Search size={20} aria-hidden />
           <input
+            ref={searchRef}
             type="search"
             placeholder="Search protocols, drugs, conditions…"
             value={query}
@@ -125,45 +132,32 @@ export function HomePage() {
             </button>
           )}
         </div>
-        {usedCategories.length > 1 && (
-          <div className="chips">
-            <button type="button" className={`chip ${category === null ? 'on' : ''}`} onClick={() => setCategory(null)}>
-              All
-            </button>
-            {usedCategories.map((c) => {
-              const Icon = c.icon
-              return (
-                <button
-                  key={c.id}
-                  type="button"
-                  className={`chip ${category === c.id ? 'on' : ''}`}
-                  onClick={() => setCategory(category === c.id ? null : c.id)}
-                >
-                  <Icon size={15} aria-hidden /> {c.name}
-                </button>
-              )
-            })}
-          </div>
-        )}
-      </section>
-
-      {isAdmin && (
-        <section className="admin-strip">
-          <button type="button" className="admin-tile glass" onClick={() => navigate('/admin/protocols/new')}>
-            <FilePlus2 size={22} aria-hidden />
-            <span>New protocol</span>
+        <div className="chips">
+          <button type="button" className={`chip ${category === null ? 'on' : ''}`} onClick={() => setCategory(null)}>
+            All
           </button>
-          <Link to="/admin/users" className="admin-tile glass">
-            <UserCheck size={22} aria-hidden />
-            <span>Users</span>
-            {pendingCount > 0 && <span className="count">{pendingCount}</span>}
-          </Link>
-          {missingStarters && (
-            <button type="button" className="admin-tile glass" onClick={runImport} disabled={importing}>
-              {importing ? <Loader2 size={22} className="spin" aria-hidden /> : <DownloadCloud size={22} aria-hidden />}
-              <span>Import starter protocols</span>
-            </button>
-          )}
+          {CATEGORIES.map((c) => {
+            const Icon = c.icon
+            return (
+              <button
+                key={c.id}
+                type="button"
+                className={`chip ${category === c.id ? 'on' : ''}`}
+                onClick={() => setCategory(category === c.id ? null : c.id)}
+              >
+                <Icon size={15} aria-hidden /> {c.name}
+              </button>
+            )
+          })}
+        </div>
+    </section>
+
+      {missingStarters && (
+        <section className="admin-strip">
+          <button type="button" className="admin-tile glass" onClick={runImport} disabled={importing}>
+            {importing ? <Loader2 size={22} className="spin" aria-hidden /> : <DownloadCloud size={22} aria-hidden />}
+            <span>Import starter protocols</span>
+          </button>
         </section>
       )}
       {importMsg && <div className="notice">{importMsg}</div>}

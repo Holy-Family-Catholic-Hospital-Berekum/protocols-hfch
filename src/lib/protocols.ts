@@ -42,7 +42,7 @@ export function pickContent(p: ProtocolContent): ProtocolContent {
 export function emptyProtocol(): ProtocolContent {
   return {
     title: '',
-    category: 'other',
+    category: '',
     version: 'v1.0',
     summary: '',
     keywords: [],

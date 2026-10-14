@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Check, Crown, Loader2, ShieldOff, UserMinus, UserPlus, X } from 'lucide-react'
+import { Check, Crown, Loader2, ShieldOff, UserMinus, UserPlus, X } from 'lucide-react'
 import { useAuth, type Role } from '../../auth/authContext'
 import { setRole, useUsers, type UserRecord } from '../../lib/users'
 import { formatDate } from '../../lib/format'
@@ -71,13 +70,9 @@ const GROUPS: { role: Role; title: string }[] = [
 export function UsersPage() {
   const { profile } = useAuth()
   const { users, loading } = useUsers(true)
-  const navigate = useNavigate()
 
   return (
     <div className="users">
-      <button type="button" className="back" onClick={() => (window.history.length > 1 ? navigate(-1) : navigate('/'))}>
-        <ArrowLeft size={18} aria-hidden /> Back
-      </button>
       <h1>Users</h1>
       {loading ? (
         <div className="center-pad">
