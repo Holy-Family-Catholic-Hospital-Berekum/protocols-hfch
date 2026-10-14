@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { collection, doc, onSnapshot, orderBy, query, updateDoc, type Timestamp } from 'firebase/firestore'
+import { collection, doc, onSnapshot, orderBy, query, updateDoc, writeBatch, type Timestamp } from 'firebase/firestore'
 import { httpsCallable } from 'firebase/functions'
 import { FirebaseError } from 'firebase/app'
 import { db, functions } from './firebase'
@@ -46,5 +46,14 @@ export async function deleteUserAccount(uid: string) {
       throw new Error('No internet connection. Deleting a user needs to be online.')
     }
     throw new Error(err instanceof FirebaseError ? err.message : 'Could not delete the user.')
+  }
+}
+
+/** Sets the same role on many users at once (Firestore batches are capped at 500 writes). */
+export async function setRoles(uids: string[], role: Role) {
+  for (let i = 0; i < uids.length; i += 450) {
+    const batch = writeBatch(db)
+    for (const uid of uids.slice(i, i + 450)) batch.update(doc(db, 'users', uid), { role })
+    await batch.commit()
   }
 }

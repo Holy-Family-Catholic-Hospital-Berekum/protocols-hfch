@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
-import { Ban, Check, Crown, Loader2, Search, ShieldOff, Trash2, UserPlus, X } from 'lucide-react'
+import { Ban, Check, CheckCheck, Crown, Loader2, Search, ShieldOff, Trash2, UserPlus, X } from 'lucide-react'
 import { useAuth, type Role } from '../../auth/authContext'
-import { deleteUserAccount, setRole, useUsers, type UserRecord } from '../../lib/users'
+import { deleteUserAccount, setRole, setRoles, useUsers, type UserRecord } from '../../lib/users'
 import { formatDate } from '../../lib/format'
 
 function UserRow({ u, self }: { u: UserRecord; self: boolean }) {
@@ -109,6 +109,26 @@ export function UsersPage() {
   const { profile } = useAuth()
   const { users, loading } = useUsers(true)
   const [query, setQuery] = useState('')
+  const [approvingAll, setApprovingAll] = useState(false)
+  const [bulkError, setBulkError] = useState('')
+
+  const approveAll = async (list: UserRecord[]) => {
+    const names = list.map((u) => u.displayName || u.email)
+    const preview = names.slice(0, 10).join('\n') + (names.length > 10 ? `\n…and ${names.length - 10} more` : '')
+    if (!confirm(`Approve ${list.length} people as staff?\n\n${preview}`)) return
+    setApprovingAll(true)
+    setBulkError('')
+    try {
+      await setRoles(
+        list.map((u) => u.uid),
+        'staff',
+      )
+    } catch (err) {
+      setBulkError(err instanceof Error ? err.message : 'Could not approve everyone. Please try again.')
+    } finally {
+      setApprovingAll(false)
+    }
+  }
 
   const filtered = useMemo(() => {
     const terms = query.toLowerCase().split(/\s+/).filter(Boolean)
@@ -141,6 +161,8 @@ export function UsersPage() {
         )}
       </div>
 
+      {bulkError && <div className="form-error">{bulkError}</div>}
+
       {loading ? (
         <div className="center-pad">
           <Loader2 className="spin" size={28} aria-label="Loading" />
@@ -153,9 +175,17 @@ export function UsersPage() {
           if (list.length === 0 && (searching || role !== 'pending')) return null
           return (
             <section key={role} className="group">
-              <h2 className="list-head">
-                {title} <span className="count-soft">{list.length}</span>
-              </h2>
+              <div className="group-head">
+                <h2 className="list-head">
+                  {title} <span className="count-soft">{list.length}</span>
+                </h2>
+                {role === 'pending' && list.length > 1 && (
+                  <button type="button" className="btn primary small" disabled={approvingAll} onClick={() => approveAll(list)}>
+                    {approvingAll ? <Loader2 size={16} className="spin" aria-hidden /> : <CheckCheck size={16} aria-hidden />}
+                    Approve all {list.length}
+                  </button>
+                )}
+              </div>
               {list.length === 0 ? (
                 <p className="muted">No one is waiting for approval.</p>
               ) : (

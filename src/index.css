@@ -2612,3 +2612,14 @@ textarea.input {
   gap: 4px;
   overflow-wrap: anywhere;
 }
+
+.group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.group-head .list-head {
+  margin-right: auto;
+}
