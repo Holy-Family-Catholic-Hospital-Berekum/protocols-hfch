@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   ArrowDown,
-  ArrowLeft,
   ArrowUp,
   ChevronDown,
   ChevronRight,
@@ -37,6 +36,7 @@ import type { Block, ProtocolContent, Section, Tone } from '../../../types/proto
 import { BlockEditor, type EditorEnv } from './blockEditor'
 import { BLOCK_TYPES } from './blockTypes'
 import { uniqueId } from './lines'
+import { setUnsavedChanges } from '../../../lib/unsavedGuard'
 
 type Tab = 'details' | 'content' | 'files' | 'preview'
 
@@ -212,6 +212,12 @@ export function EditorPage() {
   const [uploadOriginal, setUploadOriginal] = useState(false)
   const [uploading, setUploading] = useState(false)
 
+  // Lets the top bar / bottom nav ask before discarding edits; cleared when the editor closes.
+  useEffect(() => {
+    setUnsavedChanges(dirty)
+    return () => setUnsavedChanges(false)
+  }, [dirty])
+
   useEffect(() => {
     if (!dirty) return
     const warn = (e: BeforeUnloadEvent) => e.preventDefault()
@@ -329,9 +335,6 @@ export function EditorPage() {
 
   return (
     <div className="editor">
-      <button type="button" className="back" onClick={() => (!dirty || confirm('Discard unsaved changes?')) && ((window.history.state as { idx?: number } | null)?.idx ? navigate(-1) : navigate('/', { replace: true }))}>
-        <ArrowLeft size={18} aria-hidden /> Back
-      </button>
       <h1>{routeId ? 'Edit protocol' : 'New protocol'}</h1>
       {isPublished && (
         <div className="notice">

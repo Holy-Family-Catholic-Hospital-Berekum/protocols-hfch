@@ -2330,3 +2330,8 @@ textarea.input {
 .update-bar span {
   flex: 1;
 }
+
+/* Editor save bar sits above the bottom navigation */
+.has-bottom-nav .save-bar {
+  bottom: calc(var(--nav-h) + 10px + env(safe-area-inset-bottom));
+}
