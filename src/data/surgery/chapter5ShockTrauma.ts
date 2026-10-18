@@ -1,5 +1,5 @@
 import type { Section } from '../../types/protocol'
-import { box, fig, li, note, ol, p, refs, sec, see, table, ul, warn, type Place } from './helpers'
+import { box, fig, li, note, ol, p, refs, sec, see, table, ul, warn, type Place } from '../helpers'
 
 const SHOCK: Place = { chapter: '5. Surgical emergencies', subchapter: '5.1 Shock' }
 const TRAUMA: Place = { chapter: '5. Surgical emergencies', subchapter: '5.2 Trauma' }

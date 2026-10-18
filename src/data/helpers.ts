@@ -1,4 +1,4 @@
-import type { Block, ListItem, Section, Tone } from '../../types/protocol'
+import type { Block, FlowNode, ListItem, Section, Tone } from '../types/protocol'
 
 /** Small builders that keep the guideline transcription readable. */
 
@@ -55,3 +55,23 @@ export const sec = (
   blocks: Block[],
   extra: { tone?: Tone; timeTarget?: string } = {},
 ): Section => ({ id, number, title, chapter: place.chapter, subchapter: place.subchapter, ...extra, blocks })
+
+/** A section of a single-page protocol (no chapters). */
+export const section = (
+  id: string,
+  title: string,
+  blocks: Block[],
+  extra: { tone?: Tone; timeTarget?: string } = {},
+): Section => ({ id, title, ...extra, blocks })
+
+/** Link to another protocol. */
+export const goTo = (protocolId: string, label: string, condition?: string): Block => ({ type: 'link', protocolId, label, condition })
+
+export const decision = (question: string, branches: { label: string; tone: Tone; target: string }[], detail?: string): Block => ({
+  type: 'decision',
+  question,
+  detail,
+  branches,
+})
+
+export const flow = (...nodes: FlowNode[]): Block => ({ type: 'flow', nodes })

@@ -1,2 +1,14 @@
 /** Ids of the bundled starter protocols. Kept separate so the (large) content is only loaded when an admin imports. */
-export const STARTER_IDS = ['acs', 'bradycardia', 'cardiac-arrest', 'cardiogenic-shock', 'surgery-guidelines']
+export const STARTER_IDS = ['acs', 'bradycardia', 'cardiac-arrest', 'cardiogenic-shock', 'surgery-guidelines',
+  'an-anaphylaxis',
+  'an-equipment-checklist',
+  'an-la-toxicity',
+  'an-malignant-hyperthermia',
+  'an-cicv',
+  'an-pals',
+  'an-pals-rcuk',
+  'an-asystole-pea',
+  'an-vt-paeds',
+  'an-svt-paeds',
+  'an-bradycardia-paeds',
+]
