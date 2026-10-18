@@ -11,4 +11,6 @@ export const STARTER_IDS = ['acs', 'bradycardia', 'cardiac-arrest', 'cardiogenic
   'an-vt-paeds',
   'an-svt-paeds',
   'an-bradycardia-paeds',
+  'pd-asthma-gts',
+  'pd-treatment-guidelines',
 ]
