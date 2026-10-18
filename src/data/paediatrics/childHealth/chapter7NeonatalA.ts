@@ -619,7 +619,7 @@ export const CHAPTER_7_NEONATAL_A: Section[] = [
       see('k-neonatal-abc', 'Neonatal resuscitation'),
       p('**2) Correct hypoglycaemia and shock**'),
       p('**3) Give antibiotics**'),
-      see('k-mbu-antibiotics', '7.12 Antibiotic protocol for babies admitted to MBU'),
+      see('k-mbu-antibiotics', '7.12 Antibiotic protocol for babies admitted to the newborn unit'),
       p('**4) Feeding/IV fluids**'),
       ul(
         "a) Amount will depend on the baby's weight and age",

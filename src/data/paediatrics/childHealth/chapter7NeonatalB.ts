@@ -3,7 +3,7 @@ import { box, danger, drug, fig, li, note, ol, p, sec, see, table, ul, warn } fr
 import { C7 } from './chapter7NeonatalA'
 
 export const CHAPTER_7_NEONATAL_B: Section[] = [
-  sec(C7, 'k-mbu-feeding', '7.6', 'Feeding protocol for babies admitted to the Mother Baby Unit', [
+  sec(C7, 'k-mbu-feeding', '7.6', 'Feeding protocol for babies admitted to the newborn unit', [
     box(
       'info',
       'The ideal',
@@ -265,7 +265,7 @@ export const CHAPTER_7_NEONATAL_B: Section[] = [
     ),
   ]),
 
-  sec(C7, 'k-mbu-antibiotics', '7.12', 'Antibiotic protocol for babies admitted to MBU', [
+  sec(C7, 'k-mbu-antibiotics', '7.12', 'Antibiotic protocol for babies admitted to the newborn unit', [
     ol(
       'Take BLOOD and CSF for culture before starting antibiotics',
       'See the drug dosages chart for the antibiotic dosages',
