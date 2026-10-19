@@ -2,6 +2,7 @@ import type { ProtocolContent } from '../types/protocol'
 import { SURGERY_GUIDELINES } from './surgery'
 import { ANAESTHESIA_PROTOCOLS } from './anaesthesia'
 import { PAEDIATRICS_PROTOCOLS } from './paediatrics'
+import { INTERNAL_MEDICINE_PROTOCOLS } from './internalMedicine'
 
 /**
  * Starter protocols transcribed from the source PDF (pages 1-4).
@@ -561,4 +562,5 @@ export const STARTER_PROTOCOLS: Record<string, ProtocolContent> = {
   ...ANAESTHESIA_PROTOCOLS,
 
   ...PAEDIATRICS_PROTOCOLS,
+  ...INTERNAL_MEDICINE_PROTOCOLS,
 }
