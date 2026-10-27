@@ -15,4 +15,7 @@ export const STARTER_IDS = ['acs', 'bradycardia', 'cardiac-arrest', 'cardiogenic
   'pd-treatment-guidelines',
   'pd-newborn-unit',
   'im-handbook',
+  'dn-avulsion-open-apex',
+  'dn-avulsion-closed-apex',
+  'dn-ortho-bonding',
 ]
