@@ -4,6 +4,7 @@ import { ANAESTHESIA_PROTOCOLS } from './anaesthesia'
 import { PAEDIATRICS_PROTOCOLS } from './paediatrics'
 import { INTERNAL_MEDICINE_PROTOCOLS } from './internalMedicine'
 import { DENTAL_PROTOCOLS } from './dental'
+import { OBS_GYN_PROTOCOLS } from './obsGyn'
 
 /**
  * Starter protocols transcribed from the source PDF (pages 1-4).
@@ -565,4 +566,5 @@ export const STARTER_PROTOCOLS: Record<string, ProtocolContent> = {
   ...PAEDIATRICS_PROTOCOLS,
   ...INTERNAL_MEDICINE_PROTOCOLS,
   ...DENTAL_PROTOCOLS,
+  ...OBS_GYN_PROTOCOLS,
 }

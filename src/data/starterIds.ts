@@ -18,4 +18,8 @@ export const STARTER_IDS = ['acs', 'bradycardia', 'cardiac-arrest', 'cardiogenic
   'dn-avulsion-open-apex',
   'dn-avulsion-closed-apex',
   'dn-ortho-bonding',
+  'og-cord-prolapse',
+  'og-vacuum-extraction',
+  'og-iv-antihypertensives',
+  'og-magnesium-sulfate',
 ]
