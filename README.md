@@ -41,6 +41,23 @@ The rules are written so that a compromised admin account can do as little lasti
 - `updatedBy`, `updatedAt`, `verifiedAt`, `archivedBy` and `archivedAt` must be the signed-in user and the
   server time.
 
+### App Check
+
+App Check makes Firestore and Storage accept requests only from this app, so a stolen password can't be used
+from a script. It is off until `VITE_RECAPTCHA_SITE_KEY` is set.
+
+1. Google Cloud Console (project `protocols-hfch`) → Security → reCAPTCHA → **Create key**: type **Website**,
+   add the app's domains (e.g. `protocols-hfch.vercel.app`). Copy the key id.
+2. Firebase Console → App Check → Apps → the web app → **reCAPTCHA Enterprise** → paste the key → Save.
+3. Add `VITE_RECAPTCHA_SITE_KEY` (the key id) in Vercel's environment variables and redeploy.
+4. Local development: Firebase Console → App Check → the web app → ⋮ → **Manage debug tokens** → add one, and
+   put it in `.env` as `VITE_APPCHECK_DEBUG_TOKEN`.
+5. Watch Firebase Console → App Check → APIs → Cloud Firestore / Cloud Storage for a few days. When almost all
+   requests are **verified**, click **Enforce** on each. Until then nothing is blocked.
+
+Devices still on an old version of the app get no token; they pick up the new version on their next online
+visit. Enforce only after that has happened.
+
 ## Vercel
 
 Import the GitHub repo in Vercel (framework preset: Vite) and add the six `VITE_FIREBASE_*` variables under
