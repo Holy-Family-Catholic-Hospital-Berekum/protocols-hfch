@@ -58,6 +58,17 @@ from a script. It is off until `VITE_RECAPTCHA_SITE_KEY` is set.
 Devices still on an old version of the app get no token; they pick up the new version on their next online
 visit. Enforce only after that has happened.
 
+### Usage analytics
+
+Google Analytics (linked to the Firebase project) records daily/monthly users, retention, engagement time
+and page views automatically, plus two events: `protocol_view` (`protocol_id`, `protocol_title`,
+`department`) and `handbook_section_view` (`protocol_id`, `section_id`, `section_title`). No names or emails
+are sent. It is on only where `VITE_FIREBASE_MEASUREMENT_ID` is set (Vercel production), so local
+development isn't counted. Use while offline is not recorded.
+
+To see the event parameters in reports: Google Analytics → Admin → Custom definitions → Create custom
+dimension (scope: Event) for each parameter above.
+
 ## Vercel
 
 Import the GitHub repo in Vercel (framework preset: Vite) and add the six `VITE_FIREBASE_*` variables under

@@ -6,6 +6,7 @@ import { SectionCard } from '../components/protocol/protocolView'
 import { buildAnchorIndex, buildSectionOf, scrollToAnchor } from '../components/protocol/anchors'
 import { rememberLastSection, sectionPath } from '../components/protocol/handbookUtils'
 import type { BlockContext } from '../components/protocol/blocks'
+import { trackHandbookSectionView } from '../lib/analytics'
 
 /** One section of a long guideline, with breadcrumb and previous/next navigation. */
 export function HandbookSectionPage() {
@@ -44,6 +45,11 @@ export function HandbookSectionPage() {
       return () => window.clearTimeout(t)
     }
   }, [id, section, landingAnchor])
+
+  const sectionTitle = section?.title ?? ''
+  useEffect(() => {
+    if (sectionTitle) trackHandbookSectionView(id, sectionId, sectionTitle)
+  }, [id, sectionId, sectionTitle])
 
   if (loading) {
     return (

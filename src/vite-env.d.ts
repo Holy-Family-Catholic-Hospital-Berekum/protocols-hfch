@@ -8,6 +8,8 @@ interface ImportMetaEnv {
   readonly VITE_FIREBASE_STORAGE_BUCKET: string
   readonly VITE_FIREBASE_MESSAGING_SENDER_ID: string
   readonly VITE_FIREBASE_APP_ID: string
+  /** Google Analytics measurement id (G-…). Analytics is off when unset. */
+  readonly VITE_FIREBASE_MEASUREMENT_ID?: string
   /** reCAPTCHA Enterprise site key for App Check. App Check is off when unset. */
   readonly VITE_RECAPTCHA_SITE_KEY?: string
   /** Development only: App Check debug token registered in the Firebase Console. */

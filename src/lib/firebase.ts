@@ -24,7 +24,8 @@ if (missing.length > 0) {
   throw new Error(`Missing Firebase config values: ${missing.join(', ')}. Check your .env file.`)
 }
 
-export const app = initializeApp(firebaseConfig)
+// Optional, so it is not part of the required-values check above. Analytics is off without it.
+export const app = initializeApp({ ...firebaseConfig, measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID })
 
 // App Check: Firestore and Storage only accept requests from this app (not scripts using a stolen login).
 // Set up before any other service so their first requests already carry a token.

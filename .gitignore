@@ -32,3 +32,6 @@ firebase-debug.log
 
 # Cloud Functions build output
 functions/lib
+
+# Vercel CLI project link
+.vercel

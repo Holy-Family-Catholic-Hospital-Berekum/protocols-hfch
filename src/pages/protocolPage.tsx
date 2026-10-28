@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
   BadgeCheck,
@@ -21,6 +21,7 @@ import { VerifyDialog } from '../components/verifyDialog'
 import { getCategory } from '../config/categories'
 import { formatDate } from '../lib/format'
 import { pickContent, unpublish, verifyAndPublish } from '../lib/protocols'
+import { trackProtocolView } from '../lib/analytics'
 import type { Attachment, ProtocolContent } from '../types/protocol'
 
 function AttachmentList({ attachments }: { attachments: Attachment[] }) {
@@ -68,6 +69,14 @@ export function ProtocolPage() {
   const [busy, setBusy] = useState(false)
 
   const protocol = protocols.find((p) => p.id === id)
+
+  // Once per protocol opened (not on every live update of the list).
+  const viewedId = protocol?.id
+  const viewedTitle = protocol?.title ?? ''
+  const viewedCategory = protocol?.category ?? ''
+  useEffect(() => {
+    if (viewedId) trackProtocolView(viewedId, viewedTitle, getCategory(viewedCategory).name)
+  }, [viewedId, viewedTitle, viewedCategory])
 
   if (loading) {
     return (
