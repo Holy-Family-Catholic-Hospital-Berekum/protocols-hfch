@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react'
 import { collection, doc, onSnapshot, orderBy, query, updateDoc, writeBatch, type Timestamp } from 'firebase/firestore'
-import { httpsCallable } from 'firebase/functions'
-import { FirebaseError } from 'firebase/app'
-import { db, functions } from './firebase'
+import { db } from './firebase'
 import type { Role } from '../auth/authContext'
 
 export interface UserRecord {
@@ -35,18 +33,6 @@ export function useUsers(enabled: boolean) {
 
 export async function setRole(uid: string, role: Role) {
   await updateDoc(doc(db, 'users', uid), { role })
-}
-
-/** Permanently deletes a user's sign-in account and profile (admin-only Cloud Function). */
-export async function deleteUserAccount(uid: string) {
-  try {
-    await httpsCallable<{ uid: string }, { ok: boolean }>(functions, 'deleteUser')({ uid })
-  } catch (err) {
-    if (err instanceof FirebaseError && err.code === 'functions/unavailable') {
-      throw new Error('No internet connection. Deleting a user needs to be online.')
-    }
-    throw new Error(err instanceof FirebaseError ? err.message : 'Could not delete the user.')
-  }
 }
 
 /** Sets the same role on many users at once (Firestore batches are capped at 500 writes). */

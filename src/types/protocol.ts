@@ -116,6 +116,8 @@ export interface Protocol extends ProtocolContent {
   /** Section ids changed in the latest published version. */
   changedSections: string[]
   changeNote: string
+  /** Id of the archived copy made by the latest change to the published protocol. */
+  lastArchiveId?: string
 }
 
 export interface ProtocolVersion extends ProtocolContent {

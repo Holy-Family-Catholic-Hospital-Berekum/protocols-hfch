@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
-import { Ban, Check, CheckCheck, Crown, Loader2, Search, ShieldOff, Trash2, UserPlus, X } from 'lucide-react'
+import { Ban, Check, CheckCheck, Loader2, Search, UserPlus, X } from 'lucide-react'
 import { useAuth, type Role } from '../../auth/authContext'
-import { deleteUserAccount, setRole, setRoles, useUsers, type UserRecord } from '../../lib/users'
+import { setRole, setRoles, useUsers, type UserRecord } from '../../lib/users'
 import { formatDate } from '../../lib/format'
 
 function UserRow({ u, self }: { u: UserRecord; self: boolean }) {
@@ -48,48 +48,22 @@ function UserRow({ u, self }: { u: UserRecord; self: boolean }) {
               </>
             )}
             {u.role === 'staff' && (
-              <>
-                <button
-                  type="button"
-                  className="btn ghost small"
-                  disabled={busy}
-                  onClick={() => change('admin', `Make ${name} an admin? They will be able to edit and publish protocols and manage users.`)}
-                >
-                  <Crown size={16} aria-hidden /> Make admin
-                </button>
-                <button
-                  type="button"
-                  className="btn ghost small"
-                  disabled={busy}
-                  onClick={() => change('rejected', `Block ${name}? They will lose access immediately. You can restore access later.`)}
-                >
-                  <Ban size={16} aria-hidden /> Block
-                </button>
-              </>
-            )}
-            {u.role === 'admin' && (
-              <button type="button" className="btn ghost small" disabled={busy} onClick={() => change('staff', `Remove admin rights from ${name}?`)}>
-                <ShieldOff size={16} aria-hidden /> Make staff
+              <button
+                type="button"
+                className="btn ghost small"
+                disabled={busy}
+                onClick={() => change('rejected', `Block ${name}? They will lose access immediately. You can restore access later.`)}
+              >
+                <Ban size={16} aria-hidden /> Block
               </button>
             )}
+            {/* Admin rights are only granted or removed in the Firebase Console (enforced by firestore.rules). */}
+            {u.role === 'admin' && <span className="role-pill role-admin">Admin</span>}
             {u.role === 'rejected' && (
               <button type="button" className="btn ghost small" disabled={busy} onClick={() => change('staff')}>
                 <UserPlus size={16} aria-hidden /> Restore access
               </button>
             )}
-            <button
-              type="button"
-              className="btn ghost small danger"
-              disabled={busy}
-              onClick={() =>
-                run(
-                  () => deleteUserAccount(u.uid),
-                  `Permanently delete ${name}?\n\nTheir account will be removed and they will be signed out. This cannot be undone; they would have to sign up again with a new account.`,
-                )
-              }
-            >
-              <Trash2 size={16} aria-hidden /> Delete
-            </button>
           </>
         )}
       </div>

@@ -18,10 +18,8 @@ import { useAuth } from '../../../auth/authContext'
 import { useProtocolList } from '../../../lib/protocolsContext'
 import {
   ALLOWED_UPLOAD_TYPES,
-  deleteProtocol,
   emptyProtocol,
   pickContent,
-  removeAttachmentFile,
   saveDraft,
   slugify,
   uploadAttachment,
@@ -356,11 +354,10 @@ export function EditorPage() {
     }
   }
 
-  const removeAttachment = async (path: string) => {
+  // Only unlinks the file: stored files are never deleted (archived versions may still reference them).
+  const removeAttachment = (path: string) => {
     if (!confirm('Remove this file?')) return
     update({ attachments: content.attachments.filter((a) => a.path !== path) })
-    // Published protocols and their archived versions may still reference the file, so only drafts delete it.
-    if (!isPublished) await removeAttachmentFile(path).catch(() => undefined)
   }
 
   return (
@@ -508,7 +505,7 @@ export function EditorPage() {
                   <Star size={16} />
                 </button>
               )}
-              <button type="button" className="icon-btn danger" onClick={() => void removeAttachment(a.path)} aria-label="Remove file">
+              <button type="button" className="icon-btn danger" onClick={() => removeAttachment(a.path)} aria-label="Remove file">
                 <Trash2 size={16} />
               </button>
             </div>
@@ -526,19 +523,6 @@ export function EditorPage() {
       {error && <div className="form-error">{error}</div>}
 
       <div className="save-bar glass">
-        {existing && (
-          <button
-            type="button"
-            className="btn ghost small danger"
-            onClick={async () => {
-              if (!confirm(`Permanently delete "${existing.title}" and its files? This cannot be undone.`)) return
-              await deleteProtocol(existing)
-              navigate('/')
-            }}
-          >
-            <Trash2 size={16} aria-hidden /> Delete
-          </button>
-        )}
         <span className="spacer" />
         {!isPublished && (
           <button type="button" className="btn ghost" disabled={busy} onClick={doSaveDraft}>

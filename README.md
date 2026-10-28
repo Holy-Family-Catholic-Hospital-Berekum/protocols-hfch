@@ -26,7 +26,20 @@ npm run dev
    (e.g. `protocols-hfch.vercel.app`).
 3. **First admin:** the Medical Director signs up in the app (they will see "Awaiting approval"). Then in
    Firebase Console → Firestore → `users` → their document → change `role` from `pending` to `admin`.
-   After that, admins approve everyone else from the **Users** screen.
+   After that, admins approve, decline, block and restore everyone else from the **Users** screen.
+   Admin rights are only ever granted or removed this way, in the Firebase Console: the app cannot make or
+   unmake admins, so a compromised admin account cannot create more admins or lock the real ones out.
+
+### Limits on admins
+
+The rules are written so that a compromised admin account can do as little lasting damage as possible:
+
+- No one can delete user accounts, protocols or uploaded files. Users are blocked; protocols are unpublished.
+- Admins cannot change another admin's role, or make anyone an admin (see step 3).
+- A published protocol can only be changed (republished or unpublished) together with an exact copy of its
+  current content in `protocols/{id}/versions`, so every version that was ever live can be restored.
+- `updatedBy`, `updatedAt`, `verifiedAt`, `archivedBy` and `archivedAt` must be the signed-in user and the
+  server time.
 
 ## Vercel
 
@@ -40,7 +53,7 @@ Project → Settings → Environment Variables. `vercel.json` handles SPA routin
 - Every protocol is a **draft** until a clinician uses **Verify & publish** and confirms a line-by-line check
   against the source. Staff only ever see published protocols (enforced by `firestore.rules`).
 - Publishing an update archives the previous version (`protocols/{id}/versions`) and marks changed sections
-  "Updated".
+  "Updated". Unpublishing archives the live version too.
 - Starter protocols (ACS, Bradycardia, Cardiac Arrest, Cardiogenic Shock) live in
   `src/data/starterProtocols.ts`. An admin imports them from the home screen as drafts.
 

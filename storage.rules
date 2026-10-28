@@ -15,7 +15,9 @@ service firebase.storage {
         && request.resource.size < 20 * 1024 * 1024
         && request.resource.contentType.matches('application/pdf|application/msword|application/vnd[.]openxmlformats-officedocument[.]wordprocessingml[.]document|image/(png|jpeg|webp)');
 
-      allow delete: if request.auth != null && role() == 'admin';
+      // Uploaded files are never deleted (published and archived versions may reference them).
+      // Removing a file from a protocol only unlinks it.
+      allow delete: if false;
     }
 
     match /{allPaths=**} {

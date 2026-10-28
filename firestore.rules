@@ -29,7 +29,7 @@ service cloud.firestore {
       allow list: if isAdmin();
 
       // Anyone signed in can create ONLY their own profile, and only as 'pending'.
-      // Deleted accounts (tombstoned by the deleteUser function) can never recreate a profile.
+      // Accounts deleted in the past (tombstoned in deletedUsers) can never recreate a profile.
       allow create: if signedIn()
         && request.auth.uid == uid
         && !exists(/databases/$(database)/documents/deletedUsers/$(uid))
@@ -40,12 +40,14 @@ service cloud.firestore {
         && request.resource.data.displayName.size() <= 120
         && request.resource.data.createdAt == request.time;
 
-      // Admins change other people's roles (never their own, so they cannot lock themselves out).
+      // Admins approve, decline, block and restore other people. Admin rights are granted and removed only
+      // in the Firebase Console, so a compromised admin account cannot create more admins or lock real ones out.
       allow update: if (
           isAdmin()
           && request.auth.uid != uid
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['role'])
-          && request.resource.data.role in ['pending', 'staff', 'admin', 'rejected']
+          && resource.data.role in ['pending', 'staff', 'rejected']
+          && request.resource.data.role in ['pending', 'staff', 'rejected']
         ) || (
           signedIn()
           && request.auth.uid == uid
@@ -58,21 +60,78 @@ service cloud.firestore {
     }
 
     // ---- Protocols ----
+
+    function protocolPath(protocolId) {
+      return /databases/$(database)/documents/protocols/$(protocolId);
+    }
+
+    // Fields copied into an archived version.
+    function archivedKeys() {
+      return ['title', 'category', 'version', 'summary', 'keywords', 'sections', 'attachments', 'timer',
+              'verifiedBy', 'verifiedAt', 'changeNote'];
+    }
+
+    // An archived version must be an exact copy of the protocol as it is before this write.
+    function isExactCopy(v, p) {
+      return v.get('title', null) == p.get('title', null)
+        && v.get('category', null) == p.get('category', null)
+        && v.get('version', null) == p.get('version', null)
+        && v.get('summary', null) == p.get('summary', null)
+        && v.get('keywords', null) == p.get('keywords', null)
+        && v.get('sections', null) == p.get('sections', null)
+        && v.get('attachments', null) == p.get('attachments', null)
+        && v.get('timer', null) == p.get('timer', null)
+        && v.get('verifiedBy', null) == p.get('verifiedBy', null)
+        && v.get('verifiedAt', null) == p.get('verifiedAt', null)
+        && v.get('changeNote', null) == p.get('changeNote', null);
+    }
+
     match /protocols/{protocolId} {
       // Staff only ever see published protocols. Drafts are admin-only.
       allow read: if isAdmin() || (isApproved() && resource.data.status == 'published');
 
-      allow create, update: if isAdmin()
-        && request.resource.data.status in ['draft', 'published']
-        && request.resource.data.title is string
-        && request.resource.data.sections is list;
+      function validWrite() {
+        let d = request.resource.data;
+        return isAdmin()
+          && d.status in ['draft', 'published']
+          && d.title is string
+          && d.sections is list
+          // The audit fields are the real author and server time, not whatever the client claims.
+          && d.updatedBy == request.auth.uid
+          && d.updatedAt == request.time
+          // Publishing stamps the verification with the server time.
+          && (d.status != 'published' || (d.verifiedAt == request.time && d.verifiedBy is string && d.verifiedBy.size() > 0));
+      }
 
-      allow delete: if isAdmin();
+      allow create: if validWrite();
 
-      // Archived versions are an audit trail: append-only.
+      // A published protocol is only changed (republished or unpublished) together with archiving its
+      // current content under versions/{lastArchiveId}, so every live version can be restored.
+      allow update: if validWrite()
+        && (
+          resource.data.status != 'published'
+          || (
+            request.resource.data.lastArchiveId is string
+            && request.resource.data.lastArchiveId != resource.data.get('lastArchiveId', null)
+            && !exists(/databases/$(database)/documents/protocols/$(protocolId)/versions/$(request.resource.data.lastArchiveId))
+            && existsAfter(/databases/$(database)/documents/protocols/$(protocolId)/versions/$(request.resource.data.lastArchiveId))
+          )
+        );
+
+      // No one deletes protocols, not even admins: a compromised admin account must not be able to wipe them.
+      // Unpublish (back to draft) instead.
+      allow delete: if false;
+
+      // Archived versions are an audit trail: append-only, written only as part of a change to a published protocol.
       match /versions/{versionId} {
         allow read: if isApproved();
-        allow create: if isAdmin();
+        allow create: if isAdmin()
+          && get(protocolPath(protocolId)).data.status == 'published'
+          && getAfter(protocolPath(protocolId)).data.get('lastArchiveId', null) == versionId
+          && request.resource.data.keys().hasOnly(archivedKeys().concat(['archivedAt', 'archivedBy']))
+          && isExactCopy(request.resource.data, get(protocolPath(protocolId)).data)
+          && request.resource.data.archivedBy == request.auth.uid
+          && request.resource.data.archivedAt == request.time;
         allow update, delete: if false;
       }
     }

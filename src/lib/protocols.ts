@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
   collection,
-  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -11,10 +10,12 @@ import {
   runTransaction,
   serverTimestamp,
   setDoc,
-  updateDoc,
   where,
+  type DocumentData,
+  type DocumentReference,
+  type Transaction,
 } from 'firebase/firestore'
-import { deleteObject, getDownloadURL, ref, uploadBytes } from 'firebase/storage'
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
 import { db, storage } from './firebase'
 import type { Attachment, Protocol, ProtocolContent, ProtocolVersion, Section } from '../types/protocol'
 
@@ -119,6 +120,22 @@ function changedSectionIds(before: Section[], after: Section[]): string[] {
   return after.filter((s) => prev.get(s.id) !== JSON.stringify(s)).map((s) => s.id)
 }
 
+// Must match archivedKeys() in firestore.rules.
+const ARCHIVED_KEYS = [...CONTENT_KEYS, 'verifiedBy', 'verifiedAt', 'changeNote'] as const
+
+/**
+ * Copies a published protocol's current content into its versions sub-collection.
+ * The rules only accept a change to a published protocol together with this exact copy,
+ * linked by the returned lastArchiveId.
+ */
+function archiveCurrent(tx: Transaction, ref: DocumentReference, current: DocumentData, uid: string) {
+  const versionRef = doc(collection(ref, 'versions'))
+  const copy: DocumentData = {}
+  for (const k of ARCHIVED_KEYS) if (current[k] !== undefined) copy[k] = current[k]
+  tx.set(versionRef, { ...copy, archivedAt: serverTimestamp(), archivedBy: uid })
+  return { lastArchiveId: versionRef.id }
+}
+
 /**
  * Publish after clinician verification. If a published version already exists it is
  * archived to the versions sub-collection first, and changed sections are recorded.
@@ -133,22 +150,17 @@ export async function verifyAndPublish(
     const ref = doc(protocolsCol, id)
     const current = await tx.get(ref)
     let changed: string[] = []
+    let archive = {}
 
     if (current.exists() && current.data().status === 'published') {
       const prev = current.data() as Protocol
-      tx.set(doc(collection(ref, 'versions')), {
-        ...pickContent(prev),
-        verifiedBy: prev.verifiedBy ?? null,
-        verifiedAt: prev.verifiedAt ?? null,
-        changeNote: prev.changeNote ?? '',
-        archivedAt: serverTimestamp(),
-        archivedBy: uid,
-      })
+      archive = archiveCurrent(tx, ref, prev, uid)
       changed = changedSectionIds(prev.sections ?? [], content.sections)
     }
 
     tx.set(ref, {
       ...pickContent(content),
+      ...archive,
       status: 'published',
       verifiedBy: verification.verifiedBy.trim(),
       verifiedAt: serverTimestamp(),
@@ -160,15 +172,14 @@ export async function verifyAndPublish(
   })
 }
 
+/** Back to draft. The live version is archived first, so later draft edits cannot lose it. */
 export async function unpublish(id: string, uid: string) {
-  await updateDoc(doc(protocolsCol, id), { status: 'draft', updatedAt: serverTimestamp(), updatedBy: uid })
-}
-
-export async function deleteProtocol(protocol: Protocol) {
-  for (const a of protocol.attachments ?? []) {
-    await deleteObject(ref(storage, a.path)).catch(() => undefined)
-  }
-  await deleteDoc(doc(protocolsCol, protocol.id))
+  await runTransaction(db, async (tx) => {
+    const ref = doc(protocolsCol, id)
+    const current = await tx.get(ref)
+    if (!current.exists() || current.data().status !== 'published') return
+    tx.update(ref, { ...archiveCurrent(tx, ref, current.data(), uid), status: 'draft', updatedAt: serverTimestamp(), updatedBy: uid })
+  })
 }
 
 /** Imports the bundled starter protocols as drafts. Existing protocols are left untouched. */
@@ -212,8 +223,4 @@ export async function uploadAttachment(protocolId: string, file: File, isOrigina
   await uploadBytes(storageRef, file, { contentType: file.type })
   const url = await getDownloadURL(storageRef)
   return { name: file.name, path, url, contentType: file.type, size: file.size, isOriginal }
-}
-
-export async function removeAttachmentFile(path: string) {
-  await deleteObject(ref(storage, path))
 }

@@ -5,7 +5,6 @@ import {
   persistentLocalCache,
   persistentMultipleTabManager,
 } from 'firebase/firestore'
-import { getFunctions } from 'firebase/functions'
 import { getStorage } from 'firebase/storage'
 
 const firebaseConfig = {
@@ -41,6 +40,3 @@ export const db = initializeFirestore(app, {
 })
 
 export const storage = getStorage(app)
-
-// Same region as the Cloud Functions (functions/src/index.ts).
-export const functions = getFunctions(app, 'europe-west1')
