@@ -3,30 +3,9 @@ import { CheckCircle2, CloudOff, Loader2, MessageSquareHeart, Send, X } from 'lu
 import { useAuth } from '../auth/authContext'
 import { FEEDBACK_MAX, sendFeedback } from '../lib/feedback'
 
-// sessionStorage: the panel opens by itself once per visit, not on every return to Home.
-const PROMPTED_KEY = 'feedback-prompted'
-const AUTO_OPEN_MS = 2500
-
-function wasPrompted() {
-  try {
-    return sessionStorage.getItem(PROMPTED_KEY) === '1'
-  } catch {
-    return false
-  }
-}
-
-function markPrompted() {
-  try {
-    sessionStorage.setItem(PROMPTED_KEY, '1')
-  } catch {
-    /* storage unavailable */
-  }
-}
-
 /** Floating "Feedback" button with a panel to type and send feedback straight away. */
 export function FeedbackWidget() {
   const { profile } = useAuth()
-  const isAdmin = profile?.role === 'admin'
   const [open, setOpen] = useState(false)
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
@@ -34,16 +13,6 @@ export function FeedbackWidget() {
   const [error, setError] = useState('')
   const [online, setOnline] = useState(navigator.onLine)
   const textRef = useRef<HTMLTextAreaElement>(null)
-
-  // Admins read the feedback, so they aren't prompted for it.
-  useEffect(() => {
-    if (isAdmin || wasPrompted()) return
-    const t = window.setTimeout(() => {
-      markPrompted()
-      setOpen(true)
-    }, AUTO_OPEN_MS)
-    return () => window.clearTimeout(t)
-  }, [isAdmin])
 
   useEffect(() => {
     const update = () => setOnline(navigator.onLine)
@@ -65,11 +34,9 @@ export function FeedbackWidget() {
   }, [open])
 
   const openPanel = () => {
-    markPrompted()
     setResult(null)
     setError('')
     setOpen(true)
-    // Focus only when the user asked for the panel: on phones an auto-opened panel shouldn't pop up the keyboard.
     window.setTimeout(() => textRef.current?.focus(), 50)
   }
 
@@ -105,7 +72,7 @@ export function FeedbackWidget() {
         </span>
         <div className="feedback-title">
           <strong id="feedback-title">Any feedback for us?</strong>
-          <span className="muted small">Ideas, mistakes in a protocol, anything. It goes to the admins.</span>
+          <span className="muted small">What are we doing well? What challenges are you experiencing?</span>
         </div>
         <button type="button" className="icon-btn" onClick={() => setOpen(false)} aria-label="Close feedback">
           <X size={18} />
