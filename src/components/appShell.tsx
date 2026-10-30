@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState, type MouseEvent } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate, useNavigationType } from 'react-router-dom'
-import { ArrowLeft, FilePlus2, Home, LogOut, Search, Users, Wifi, WifiOff } from 'lucide-react'
+import { ArrowLeft, FilePlus2, Home, LogOut, MessageSquareHeart, Search, Users, Wifi, WifiOff } from 'lucide-react'
 import { useAuth } from '../auth/authContext'
 import { useUsers } from '../lib/users'
+import { useFeedback } from '../lib/feedback'
 import { InstallPrompt } from './installPrompt'
 import { confirmLeave } from '../lib/unsavedGuard'
 
@@ -54,6 +55,8 @@ export function AppShell() {
   const isAdmin = profile?.role === 'admin'
   const { users } = useUsers(isAdmin)
   const pendingCount = users.filter((u) => u.role === 'pending').length
+  const { items: feedback } = useFeedback(isAdmin)
+  const unreadFeedback = feedback.filter((f) => !f.read).length
   const { online, toast, dismissToast } = useConnectivity()
   const [menu, setMenu] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -175,6 +178,15 @@ export function AppShell() {
               {pendingCount > 0 && <span className="nav-badge">{pendingCount}</span>}
             </span>
             <span>Users</span>
+          </NavLink>
+        )}
+        {isAdmin && (
+          <NavLink to="/admin/feedback" end onClick={guard} className={({ isActive }) => `nav-item ${isActive ? 'on' : ''}`}>
+            <span className="nav-icon">
+              <MessageSquareHeart size={22} aria-hidden />
+              {unreadFeedback > 0 && <span className="nav-badge">{unreadFeedback}</span>}
+            </span>
+            <span>Feedback</span>
           </NavLink>
         )}
       </nav>

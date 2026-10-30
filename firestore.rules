@@ -136,6 +136,28 @@ service cloud.firestore {
       }
     }
 
+    // ---- Feedback ----
+    // Staff send it from the Home page (offline writes sync later and are checked then). Only admins read it.
+    match /feedback/{feedbackId} {
+      allow create: if isApproved()
+        && request.resource.data.keys().hasOnly(['text', 'uid', 'displayName', 'email', 'createdAt', 'read'])
+        && request.resource.data.text is string
+        && request.resource.data.text.size() > 0
+        && request.resource.data.text.size() <= 2000
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.displayName is string
+        && request.resource.data.displayName.size() <= 120
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.read == false;
+      allow read: if isAdmin();
+      // Admins only mark feedback read or unread; no one edits or deletes what staff wrote.
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read'])
+        && request.resource.data.read is bool;
+      allow delete: if false;
+    }
+
     // Everything else is closed.
     match /{document=**} {
       allow read, write: if false;

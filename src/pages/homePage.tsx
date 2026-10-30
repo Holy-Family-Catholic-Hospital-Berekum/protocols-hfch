@@ -8,6 +8,7 @@ import { CATEGORIES, getCategory } from '../config/categories'
 import { daysSince, formatDate } from '../lib/format'
 import { importStarterProtocols } from '../lib/protocols'
 import { STARTER_IDS } from '../data/starterIds'
+import { FeedbackWidget } from '../components/feedbackWidget'
 import type { Protocol } from '../types/protocol'
 
 const RECENT_DAYS = 30
@@ -233,6 +234,8 @@ export function HomePage() {
           )}
         </>
       )}
+
+      <FeedbackWidget />
     </div>
   )
 }

@@ -11,6 +11,7 @@ import { ProtocolPage } from './pages/protocolPage'
 import { HistoryPage, VersionPage } from './pages/historyPage'
 import { HandbookSectionPage } from './pages/handbookSectionPage'
 import { UsersPage } from './pages/admin/usersPage'
+import { FeedbackPage } from './pages/admin/feedbackPage'
 import { EditorPage } from './pages/admin/editor/editorPage'
 
 function Splash() {
@@ -45,6 +46,7 @@ function Gate() {
           <Route path="p/:id/history" element={<HistoryPage />} />
           <Route path="p/:id/history/:versionId" element={<VersionPage />} />
           <Route path="admin/users" element={<AdminOnly><UsersPage /></AdminOnly>} />
+          <Route path="admin/feedback" element={<AdminOnly><FeedbackPage /></AdminOnly>} />
           <Route path="admin/protocols/new" element={<AdminOnly><EditorPage /></AdminOnly>} />
           <Route path="admin/protocols/:id/edit" element={<AdminOnly><EditorPage /></AdminOnly>} />
           <Route path="*" element={<Navigate to="/" replace />} />

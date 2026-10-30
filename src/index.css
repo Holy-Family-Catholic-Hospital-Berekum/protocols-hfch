@@ -742,6 +742,138 @@ textarea.input {
   vertical-align: -2px;
 }
 
+/* Feedback: floating button bottom-right on Home, opens a panel with the text box ready */
+.feedback-fab {
+  position: fixed;
+  right: 16px;
+  bottom: calc(18px + env(safe-area-inset-bottom));
+  z-index: 46;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 18px;
+  border-radius: 999px;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 750;
+  color: #160a2e;
+  background: linear-gradient(135deg, #a78bfa, #38bdf8);
+  box-shadow: 0 14px 36px -10px rgba(167, 139, 250, 0.8);
+  animation: rise 0.4s ease both, feedback-glow 2.6s ease-in-out 1s infinite;
+  -webkit-tap-highlight-color: transparent;
+}
+.feedback-fab:active {
+  transform: scale(0.96);
+}
+@keyframes feedback-glow {
+  0%,
+  100% {
+    box-shadow: 0 14px 36px -10px rgba(167, 139, 250, 0.8), 0 0 0 0 rgba(167, 139, 250, 0.55);
+  }
+  50% {
+    box-shadow: 0 14px 36px -10px rgba(167, 139, 250, 0.8), 0 0 0 10px rgba(167, 139, 250, 0);
+  }
+}
+.feedback-panel {
+  position: fixed;
+  right: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  z-index: 51;
+  width: min(400px, calc(100vw - 24px));
+  padding: 14px;
+  border-radius: 22px;
+  background: rgba(13, 22, 48, 0.96);
+  border-color: rgba(167, 139, 250, 0.45);
+  animation: rise 0.3s ease both;
+}
+.has-bottom-nav .feedback-fab,
+.has-bottom-nav .feedback-panel {
+  bottom: calc(var(--nav-h) + 12px + env(safe-area-inset-bottom));
+}
+/* Keep the button clear of the "Install the app" banner while it is showing. */
+.has-bottom-nav:has(.install) .feedback-fab {
+  bottom: calc(var(--nav-h) + 96px + env(safe-area-inset-bottom));
+}
+.feedback-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.feedback-badge {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  color: #160a2e;
+  background: linear-gradient(135deg, #a78bfa, #38bdf8);
+}
+.feedback-title {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.feedback-text {
+  min-height: 104px;
+  max-height: 40dvh;
+}
+.feedback-offline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 0;
+  color: var(--urgent);
+}
+.feedback-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+}
+.feedback-done {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 0 2px;
+  text-align: center;
+}
+.feedback-done .ok {
+  color: var(--stable);
+}
+.feedback-done .queued {
+  color: var(--urgent);
+}
+.feedback-done .feedback-actions {
+  width: 100%;
+  justify-content: flex-end;
+}
+.feedback-row {
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  margin-top: 10px;
+}
+.feedback-row.unread {
+  border-color: rgba(167, 139, 250, 0.55);
+}
+.feedback-row-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.feedback-row-text {
+  margin: 10px 0 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 /* ===== Home ===== */
 .hero {
   padding: 18px 0 8px;
@@ -2287,6 +2419,8 @@ textarea.input {
   .timer-fab,
   .timer-panel,
   .install,
+  .feedback-fab,
+  .feedback-panel,
   .p-actions,
   .back {
     display: none !important;
